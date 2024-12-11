@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gebrauchtwagensuche</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- Lade-Overlay, das standardmäßig verborgen ist -->
+            <div class="loading-overlay" id="loading-overlay">
+                Lade Daten...
+            </div>
+            
+            <!-- Anzeige des Autos -->
+            <div class="car-image" id="car-image">
+                <img src="" alt="Auto Bild" id="car-img">
+            </div>
+            <div class="car-info" id="car-info">
+                <h2 id="car-title">Auto Details</h2>
+                <p id="car-details">Kilometerstand: 10.000 km<br>
+                    Leistung: 150 PS<br>
+                    Erstzulassung: 01/2018<br>
+                    Getriebe: Automatik<br>
+                    Farbe: Schwarz
+                </p>
+                <p><strong>ID:</strong> <span id="car-id">1</span></p>
+            </div>
+            <div class="actions">
+                <button class="btn like" id="like-btn">Like</button>
+                <button class="btn dislike" id="dislike-btn">Dislike</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
