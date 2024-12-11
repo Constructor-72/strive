@@ -1,0 +1,8 @@
+Title: BMW X4 M
+Price: 70.000€
+Mileage: 60.000
+Power: 510
+First Registration: 10.2021
+Transmission: Automatik
+Color: Gelb
+Owners: 2

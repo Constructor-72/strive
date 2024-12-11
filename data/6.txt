@@ -1,0 +1,8 @@
+Title: BMW M550
+Price: 30.000
+Mileage: 105.000
+Power: 381
+First Registration: 05.2016
+Transmission: Automatik
+Color: Gelb
+Owners: 2

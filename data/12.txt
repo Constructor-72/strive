@@ -1,0 +1,8 @@
+Title: Honda Civic
+Price: 23.000€
+Mileage: 20.000
+Power: 126
+First Registration: 10.2021
+Transmission: Automatik
+Color: Silber
+Owners: 1

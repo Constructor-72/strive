@@ -1,0 +1,8 @@
+Title: Ford Cortina
+Price: 26.000€
+Mileage: 90.000
+Power: 79
+First Registration: 10.1966
+Transmission: Schaltgetriebe
+Color: Andere
+Owners: 5

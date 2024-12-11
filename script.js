@@ -1,15 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     let currentCarId = 1; // Start-Id für das erste Auto
-    const likedCars = [];
-    const dislikedCars = [];
 
     // Elemente
-    const carImageElement = document.getElementById('car-image');
     const carImgElement = document.getElementById('car-img');
-    const carInfoElement = document.getElementById('car-info');
     const carTitleElement = document.getElementById('car-title');
     const carDetailsElement = document.getElementById('car-details');
-    const carIdElement = document.getElementById('car-id');
     const likeButton = document.getElementById('like-btn');
     const dislikeButton = document.getElementById('dislike-btn');
     const loadingOverlay = document.getElementById('loading-overlay');
@@ -20,49 +15,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Sende die Anfrage an den Server, um die Daten für das Auto zu bekommen
         fetch(`/get_car?id=${carId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert('Fehler beim Laden des Autos');
-                    return;
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Keine weiteren Autos verfügbar');
                 }
+                return response.json();
+            })
+            .then(data => {
+                // Title setzen
+                carTitleElement.textContent = data.title; // Titel direkt aus der JSON-Daten
 
-                // Daten für das Auto anzeigen
-                const car = data;
-                carImgElement.src = car.image;
-                carTitleElement.textContent = `Auto ${car.id}`;
-                carDetailsElement.innerHTML = car.details;
-                carIdElement.textContent = car.id;
+                // Details vorbereiten
+                let carDetails = `
+                    <p><strong>Preis:</strong> ${data.price}</p>
+                    <p><strong>Kilometerstand:</strong> ${data.mileage} km</p>
+                    <p><strong>Leistung (PS):</strong> ${data.power} PS</p>
+                    <p><strong>Erstzulassung:</strong> ${data.firstRegistration}</p>
+                    <p><strong>Getriebe:</strong> ${data.transmission}</p>
+                    <p><strong>Farbe:</strong> ${data.color}</p>
+                    <p><strong>Vorbesitzer:</strong> ${data.owners}</p>
+                `;
+                carDetailsElement.innerHTML = carDetails; // HTML-Inhalt mit den Details setzen
+
+                // Bild setzen
+                carImgElement.src = data.image;
 
                 loadingOverlay.style.display = 'none'; // Ladeanzeige ausblenden
             })
             .catch(error => {
                 console.error('Fehler beim Laden des Autos:', error);
+                alert('Fehler: Keine weiteren Autos verfügbar.');
                 loadingOverlay.style.display = 'none'; // Ladeanzeige ausblenden
             });
     }
 
     // Like-Button Klick-Event
     likeButton.addEventListener('click', function() {
-        likedCars.push(currentCarId);
-        console.log('Gelikt:', currentCarId);
-        // console.log('Gelikte Autos:', likedCars);
-
-        // Nächsten Datensatz laden
+        sendFeedback(currentCarId, 'like');
         currentCarId++;
         loadCarData(currentCarId);
     });
 
     // Dislike-Button Klick-Event
     dislikeButton.addEventListener('click', function() {
-        dislikedCars.push(currentCarId);
-        console.log('Gedisliked:', currentCarId);
-        // console.log('Gedislikte Autos:', dislikedCars);
-
-        // Nächsten Datensatz laden
+        sendFeedback(currentCarId, 'dislike');
         currentCarId++;
         loadCarData(currentCarId);
     });
+
+    // Funktion zum Senden von Feedback
+    function sendFeedback(carId, action) {
+        fetch('/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ car_id: carId, action: action })
+        })
+            .then(response => response.json())
+            .then(data => console.log('Feedback gesendet:', data))
+            .catch(error => console.error('Fehler beim Senden des Feedbacks:', error));
+    }
 
     // Initiales Auto laden
     loadCarData(currentCarId);

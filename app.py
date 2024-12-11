@@ -7,10 +7,30 @@ app = Flask(__name__, static_folder='.')
 DATA_FOLDER = 'data'
 feedback_data = []
 
-# Lade Textdaten
+# Lade Textdaten und extrahiere die relevanten Informationen
 def load_text_data(file_path):
+    car_data = {}
     with open(file_path, 'r', encoding='utf-8') as f:
-        return f.read()
+        lines = f.readlines()
+        for line in lines:
+            line = line.strip()
+            if line.startswith('Title:'):
+                car_data['title'] = line.replace('Title:', '').strip()
+            elif line.startswith('Price:'):
+                car_data['price'] = line.replace('Price:', '').strip()
+            elif line.startswith('Mileage:'):
+                car_data['mileage'] = line.replace('Mileage:', '').strip()
+            elif line.startswith('Power:'):
+                car_data['power'] = line.replace('Power:', '').strip()
+            elif line.startswith('First Registration:'):
+                car_data['firstRegistration'] = line.replace('First Registration:', '').strip()
+            elif line.startswith('Transmission:'):
+                car_data['transmission'] = line.replace('Transmission:', '').strip()
+            elif line.startswith('Color:'):
+                car_data['color'] = line.replace('Color:', '').strip()
+            elif line.startswith('Owners:'):
+                car_data['owners'] = line.replace('Owners:', '').strip()
+    return car_data
 
 # Lade Datensätze
 def load_data():
@@ -21,11 +41,14 @@ def load_data():
             image_path = os.path.join(DATA_FOLDER, f"{data_id}.jpg")
             text_path = os.path.join(DATA_FOLDER, file)
             if os.path.exists(image_path):
-                text = load_text_data(text_path)
-                dataset.append({'id': data_id, 'image': image_path, 'text': text})
+                # Textdaten laden und die Felder extrahieren
+                car_data = load_text_data(text_path)
+                car_data['id'] = int(data_id)
+                car_data['image'] = f"/data/{data_id}.jpg"
+                dataset.append(car_data)
     
     # Sortiere Datensätze nach der ID (numerisch)
-    dataset.sort(key=lambda x: int(x['id']))  # Sortiert nach der ID
+    dataset.sort(key=lambda x: x['id'])
     return dataset
 
 # API: Nächster Datensatz
@@ -34,15 +57,11 @@ def get_car():
     dataset = load_data()
     
     # Verwende den Request-Parameter `id` oder setze ihn auf 1, wenn nicht angegeben
-    current_id = int(request.args.get('id', 1))  # Start bei ID 1, nicht 0
+    current_id = int(request.args.get('id', 1))
 
-    if current_id - 1 < len(dataset):  # Stellen Sie sicher, dass `current_id` im gültigen Bereich liegt
-        car = dataset[current_id - 1]  # Da die Liste bei 0 indiziert ist, subtrahiere 1
-        return jsonify({
-            'id': car['id'],
-            'image': car['image'],
-            'details': car['text']
-        })
+    car = next((item for item in dataset if item['id'] == current_id), None)
+    if car:
+        return jsonify(car)
     else:
         return jsonify({'error': 'No more cars available'}), 404
 
@@ -57,11 +76,28 @@ def feedback():
     feedback_entry = {'car_id': data['car_id'], 'action': data['action']}
     feedback_data.append(feedback_entry)
 
-    # Speichere Feedback in einer Datei (optional)
-    with open('feedback.json', 'w') as f:
+    # Speichere Feedback in einer Datei
+    with open('feedback.json', 'w', encoding='utf-8') as f:
         json.dump(feedback_data, f, indent=4)
 
     return jsonify({'status': 'success'})
+
+# Vorhersage-Endpunkt
+@app.route('/predict', methods=['GET'])
+def predict():
+    # Wenn kein Feedback existiert, eine einfache zufällige Vorhersage treffen
+    if not feedback_data:
+        return jsonify({'title': None})
+
+    # Berechne basierend auf Feedback eine einfache Vorhersage
+    like_count = sum(1 for entry in feedback_data if entry['action'] == 'like')
+    dislike_count = sum(1 for entry in feedback_data if entry['action'] == 'dislike')
+
+    # Beispiel-Logik für Vorhersage: Bei mehr "Likes" als "Dislikes" zeigen wir ein Auto mit einer "beliebten" Farbe an.
+    if like_count > dislike_count:
+        return jsonify({'title': 'Car_with_liked_color'})
+    else:
+        return jsonify({'title': 'Car_with_disliked_color'})
 
 # Hauptseite
 @app.route('/')
