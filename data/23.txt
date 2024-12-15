@@ -1,0 +1,8 @@
+Title: VW T5
+Price: 5.000€
+Mileage: 260.000
+Power: 84
+First Registration: 09.2007
+Transmission: Schaltgetriebe
+Color: Weiß
+Owners: 4

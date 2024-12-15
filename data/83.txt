@@ -1,0 +1,8 @@
+Title: Corvette C3
+Price: 39.000€
+Mileage: 135.000
+Power: 271
+First Registration: 01.1971
+Transmission: Schaltgetriebe
+Color: Gelb
+Owners: 2

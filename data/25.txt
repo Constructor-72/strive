@@ -1,0 +1,8 @@
+Title: Mercedes E220
+Price: 12.000€
+Mileage: 197.000
+Power: 170
+First Registration: 05.2011
+Transmission: Automatik
+Color: Andere
+Owners: 2

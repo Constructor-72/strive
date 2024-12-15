@@ -1,0 +1,8 @@
+Title: Audi A6
+Price: 22.000
+Mileage: 223.000
+Power: 326
+First Registration: 05.2017
+Transmission: Automatik
+Color: Silber
+Owners: 3

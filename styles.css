@@ -8,7 +8,7 @@ body {
     align-items: center;
     height: 100vh;
     width: 100vw;
-    background-color: #f7f7f7;
+    background-color: white;
     overflow: hidden; /* Entfernt Scrollen */
 }
 
@@ -21,34 +21,48 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: white;
 }
 
 .card {
     position: relative; /* Für das Overlay */
     background-color: white;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     width: 90%; /* Reduziert die Breite etwas für bessere Darstellung */
     box-sizing: border-box;
 }
 
+/* Hintergrundfarbe für Ja-Vorhersagen */
+.card.ja {
+    background-color: rgba(76, 175, 80, 0.2); /* Leicht grün schimmernd */
+}
+
+/* Hintergrundfarbe für Nein-Vorhersagen */
+.card.nein {
+    background-color: rgba(244, 67, 54, 0.2); /* Leicht rot schimmernd */
+}
+
 .car-image img {
-    max-width: 100%;
-    border-radius: 10px;
+    max-width: 90%;
+    border-radius: 25px;
     height: auto; /* Verhindert verzerrte Bilder */
+    margin-bottom: -50px;
 }
 
 .car-info h2 {
     font-size: 1.5rem;
     margin-bottom: 10px;
     word-wrap: break-word; /* Längere Texte umbrechen */
+    color: #ffffff;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Schatten hinzufügen */
 }
 
 .actions {
     display: flex;
     justify-content: space-around;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .btn {
@@ -77,8 +91,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
+    background: rgba(197, 197, 197, 0.475);
+    color: black;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -90,7 +104,7 @@ body {
 
 /* Vollbild für alle Geräte */
 html, body {
-    height: 100%; /* Den gesamten Bildschirm einnehmen */
+    height: 95%; /* Den gesamten Bildschirm einnehmen */
     margin: 0;
 }
 
@@ -105,4 +119,3 @@ html, body {
     flex-direction: column;
     justify-content: center;
 }
-

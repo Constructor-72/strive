@@ -1,0 +1,8 @@
+Title: BMW X2
+Price: 25.000€
+Mileage: 105.000
+Power: 190
+First Registration: 11.2017
+Transmission: Automatik
+Color: Gelb
+Owners: 2

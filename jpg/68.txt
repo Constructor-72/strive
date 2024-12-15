@@ -1,0 +1,8 @@
+Title: Acura MDX
+Price: 23.000
+Mileage: 156.000
+Power: 321
+First Registration: 08.2017
+Transmission: Automatik
+Color: Rot
+Owners: 1

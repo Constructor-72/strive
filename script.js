@@ -8,13 +8,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const likeButton = document.getElementById('like-btn');
     const dislikeButton = document.getElementById('dislike-btn');
     const loadingOverlay = document.getElementById('loading-overlay');
+    const cardElement = document.querySelector('.card');
 
     // Funktion zum Laden eines neuen Autos
     function loadCarData(carId) {
         loadingOverlay.style.display = 'flex'; // Ladeanzeige aktivieren
 
-        // Sende die Anfrage an den Server, um die Daten für das Auto zu bekommen
-        fetch(`/get_car?id=${carId}`)
+        // Sende die Anfrage an den Server, um die Vorhersage für das Auto zu bekommen
+        fetch(`/predict/${carId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Vorhersage für Auto ${carId}:`, data.prediction);
+                if (data.confidence !== undefined) {
+                    console.log(`Konfidenz: ${data.confidence.toFixed(2)}%`);
+                }
+
+                // Hintergrundfarbe basierend auf der Vorhersage ändern
+                cardElement.classList.remove('ja', 'nein'); // Entferne vorherige Klassen
+                if (data.prediction === 'Ja') {
+                    cardElement.classList.add('ja');
+                } else if (data.prediction === 'Nein') {
+                    cardElement.classList.add('nein');
+                }
+
+                // Sende die Anfrage an den Server, um die Daten für das Auto zu bekommen
+                return fetch(`/get_car?id=${carId}`);
+            })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Keine weiteren Autos verfügbar');
@@ -71,7 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({ car_id: carId, action: action })
         })
             .then(response => response.json())
-            .then(data => console.log('Feedback gesendet:', data))
+            .then(data => {
+                console.log('Feedback gesendet:', data);
+            })
             .catch(error => console.error('Fehler beim Senden des Feedbacks:', error));
     }
 

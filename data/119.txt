@@ -1,0 +1,8 @@
+Title: Fiat Panda
+Price: 7.000
+Mileage: 124.000
+Power: 69
+First Registration: 12.2015
+Transmission: Schaltgetriebe
+Color: Rot
+Owners: 1

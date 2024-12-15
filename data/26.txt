@@ -1,0 +1,8 @@
+Title: Skoda Citigo
+Price: 5.000
+Mileage: 74.000
+Power: 60
+First Registration: 12.2012
+Transmission: Schaltgetriebe
+Color: Grün
+Owners: 3
