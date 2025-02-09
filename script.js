@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let carDetails = `
                     <p><strong>Preis:</strong> ${data.price} €</p>
                     <p><strong>Kilometerstand:</strong> ${data.mileage} km</p>
-                    <p><strong>Leistung (Hubraum):</strong> ${data.power} L</p>
+                    <p><strong>Hubraum:</strong> ${data.power} L</p> <!-- Änderung hier -->
                     <p><strong>Erstzulassung:</strong> ${data.firstRegistration}</p>
                     <p><strong>Getriebe:</strong> ${data.transmission}</p>
                     <p><strong>Kraftstofftyp:</strong> ${data.fuel}</p>

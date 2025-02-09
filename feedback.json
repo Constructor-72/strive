@@ -4,8 +4,16 @@
         "action": "like"
     },
     {
+        "car_id": 2,
+        "action": "like"
+    },
+    {
+        "car_id": 3,
+        "action": "like"
+    },
+    {
         "car_id": 4,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 5,
@@ -13,11 +21,11 @@
     },
     {
         "car_id": 6,
-        "action": "like"
+        "action": "dislike"
     },
     {
-        "car_id": 8,
-        "action": "dislike"
+        "car_id": 7,
+        "action": "like"
     },
     {
         "car_id": 9,
@@ -25,58 +33,50 @@
     },
     {
         "car_id": 10,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 11,
-        "action": "dislike"
-    },
-    {
-        "car_id": 12,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 13,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 14,
         "action": "like"
     },
     {
-        "car_id": 16,
-        "action": "like"
+        "car_id": 15,
+        "action": "dislike"
     },
     {
         "car_id": 17,
-        "action": "dislike"
+        "action": "like"
+    },
+    {
+        "car_id": 18,
+        "action": "like"
+    },
+    {
+        "car_id": 19,
+        "action": "like"
     },
     {
         "car_id": 20,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 21,
-        "action": "dislike"
-    },
-    {
-        "car_id": 22,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 23,
         "action": "like"
     },
     {
-        "car_id": 24,
-        "action": "dislike"
-    },
-    {
         "car_id": 25,
-        "action": "dislike"
-    },
-    {
-        "car_id": 26,
         "action": "like"
     },
     {
@@ -85,47 +85,43 @@
     },
     {
         "car_id": 28,
-        "action": "dislike"
-    },
-    {
-        "car_id": 29,
-        "action": "dislike"
-    },
-    {
-        "car_id": 31,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 32,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 33,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 34,
         "action": "dislike"
     },
     {
-        "car_id": 35,
-        "action": "dislike"
-    },
-    {
         "car_id": 36,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 37,
+        "action": "like"
+    },
+    {
+        "car_id": 38,
         "action": "dislike"
     },
     {
         "car_id": 39,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 40,
         "action": "dislike"
+    },
+    {
+        "car_id": 41,
+        "action": "like"
     },
     {
         "car_id": 42,
@@ -137,39 +133,51 @@
     },
     {
         "car_id": 44,
-        "action": "dislike"
+        "action": "like"
     },
     {
-        "car_id": 47,
-        "action": "dislike"
+        "car_id": 46,
+        "action": "like"
     },
     {
-        "car_id": 48,
-        "action": "dislike"
+        "car_id": 49,
+        "action": "like"
     },
     {
         "car_id": 50,
-        "action": "dislike"
+        "action": "like"
+    },
+    {
+        "car_id": 52,
+        "action": "like"
     },
     {
         "car_id": 53,
-        "action": "dislike"
+        "action": "like"
+    },
+    {
+        "car_id": 54,
+        "action": "like"
     },
     {
         "car_id": 55,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 56,
-        "action": "dislike"
+        "action": "like"
+    },
+    {
+        "car_id": 57,
+        "action": "like"
     },
     {
         "car_id": 58,
-        "action": "dislike"
+        "action": "like"
     },
     {
-        "car_id": 59,
-        "action": "dislike"
+        "car_id": 60,
+        "action": "like"
     },
     {
         "car_id": 61,
@@ -177,74 +185,126 @@
     },
     {
         "car_id": 62,
-        "action": "dislike"
-    },
-    {
-        "car_id": 63,
-        "action": "dislike"
-    },
-    {
-        "car_id": 64,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 65,
-        "action": "dislike"
-    },
-    {
-        "car_id": 66,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 67,
-        "action": "dislike"
+        "action": "like"
+    },
+    {
+        "car_id": 68,
+        "action": "like"
     },
     {
         "car_id": 69,
-        "action": "dislike"
+        "action": "like"
     },
     {
-        "car_id": 71,
-        "action": "dislike"
+        "car_id": 70,
+        "action": "like"
     },
     {
         "car_id": 72,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 73,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 74,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 75,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 76,
-        "action": "dislike"
+        "action": "like"
     },
     {
-        "car_id": 77,
-        "action": "dislike"
+        "car_id": 78,
+        "action": "like"
     },
     {
         "car_id": 79,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 80,
-        "action": "dislike"
-    },
-    {
-        "car_id": 82,
-        "action": "dislike"
+        "action": "like"
     },
     {
         "car_id": 83,
+        "action": "like"
+    },
+    {
+        "car_id": 84,
         "action": "dislike"
+    },
+    {
+        "car_id": 86,
+        "action": "like"
+    },
+    {
+        "car_id": 87,
+        "action": "like"
+    },
+    {
+        "car_id": 88,
+        "action": "like"
+    },
+    {
+        "car_id": 90,
+        "action": "like"
+    },
+    {
+        "car_id": 91,
+        "action": "like"
+    },
+    {
+        "car_id": 93,
+        "action": "like"
+    },
+    {
+        "car_id": 95,
+        "action": "like"
+    },
+    {
+        "car_id": 96,
+        "action": "like"
+    },
+    {
+        "car_id": 97,
+        "action": "like"
+    },
+    {
+        "car_id": 99,
+        "action": "dislike"
+    },
+    {
+        "car_id": 101,
+        "action": "like"
+    },
+    {
+        "car_id": 102,
+        "action": "like"
+    },
+    {
+        "car_id": 103,
+        "action": "like"
+    },
+    {
+        "car_id": 104,
+        "action": "like"
+    },
+    {
+        "car_id": 105,
+        "action": "like"
     }
 ]

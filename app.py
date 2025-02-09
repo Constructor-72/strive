@@ -4,6 +4,7 @@ import json
 import pandas as pd
 import random
 from model import model
+import locale
 
 app = Flask(__name__, static_folder='.')
 
@@ -12,6 +13,9 @@ feedback_data = []
 
 # Einmalige Ladevariable für die CSV-Daten
 dataset = []
+
+# Setze die lokale Umgebung auf Deutsch, um die Tausendertrennung korrekt zu formatieren
+locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
 
 # Lade CSV-Daten und extrahiere die relevanten Informationen
 def load_csv_data_once():
@@ -24,7 +28,7 @@ def load_csv_data_once():
         if file.endswith('.csv'):
             file_path = os.path.join(DATA_FOLDER, file)
             df = pd.read_csv(file_path)
-            brand = os.path.splitext(file)[0]  # Extrahiere den Markennamen aus dem Dateinamen
+            brand = os.path.splitext(file)[0].title()  # Marke mit Großbuchstaben beginnen
             df['brand'] = brand  # Füge die Marke als neue Spalte hinzu
             all_data.append(df)
 
@@ -35,9 +39,9 @@ def load_csv_data_once():
     for index, row in combined_df.iterrows():
         car_data = {
             'title': f"{row['brand']} {row['model']}",
-            'price': row['price'],
+            'price': locale.format_string("%d", row['price'], grouping=True),  # Tausendertrennung für Preis
             'price_ml': float(row['price']),
-            'mileage': row['mileage'],
+            'mileage': locale.format_string("%d", row['mileage'], grouping=True),  # Tausendertrennung für Kilometerstand
             'mileage_ml': int(row['mileage']),
             'power': row['engineSize'],
             'power_ml': float(row['engineSize']),
