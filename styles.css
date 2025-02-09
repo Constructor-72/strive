@@ -36,12 +36,21 @@ body {
 
 /* Hintergrundfarbe für Ja-Vorhersagen */
 .card.ja {
-    background-color: rgba(76, 175, 80, 0.2); /* Leicht grün schimmernd */
+    background-color: transparent; /* Anfangs unsichtbar */
 }
 
 /* Hintergrundfarbe für Nein-Vorhersagen */
 .card.nein {
-    background-color: rgba(244, 67, 54, 0.2); /* Leicht rot schimmernd */
+    background-color: transparent; /* Anfangs unsichtbar */
+}
+
+/* Sobald 30 Autos geladen wurden, Farben aktivieren */
+.card.visible-colors.ja {
+    background-color: rgba(76, 175, 80, 0.2); /* Grün */
+}
+
+.card.visible-colors.nein {
+    background-color: rgba(244, 67, 54, 0.2); /* Rot */
 }
 
 .car-image img {

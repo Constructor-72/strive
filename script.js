@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     let currentCarId = 1; // Start-Id für das erste Auto
+    let carCounter = 0; // Zählt die Anzahl der geladenen Autos
 
     // Elemente
     const carImgElement = document.getElementById('car-img');
@@ -22,11 +23,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log(`Konfidenz: ${data.confidence.toFixed(2)}%`);
                 }
 
+                // Immer Klassen hinzufügen, aber Farben erst nach 30 Autos aktivieren
                 cardElement.classList.remove('ja', 'nein');
                 if (data.prediction === 'Ja') {
                     cardElement.classList.add('ja');
                 } else if (data.prediction === 'Nein') {
                     cardElement.classList.add('nein');
+                }
+
+                // Zähler erhöhen
+                carCounter++;
+
+                // Falls 30 Autos geladen wurden, Klasse für sichtbare Farben aktivieren
+                if (carCounter >= 30) {
+                    cardElement.classList.add('visible-colors');
                 }
 
                 return fetch(`/get_car?id=${carId}`);
@@ -58,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.warn(`Fehler beim Laden von Auto ${carId}:`, error);
-                currentCarId++; // Nächstes Auto versuchen
+                currentCarId++;
                 loadCarData(currentCarId);
             });
     }

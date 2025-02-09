@@ -10,7 +10,7 @@ class CarPredictionModel:
         self.model = self._build_model()
         self.X = []
         self.y = []
-        self.min_samples = 25  # Mindestanzahl an Bewertungen
+        self.min_samples = 5  # Mindestanzahl an Bewertungen
         self.scaler = StandardScaler()
 
     def _build_model(self):
