@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadCarData(carId) {
         loadingOverlay.style.display = 'flex'; // Ladeanzeige aktivieren
 
-        // Sende die Anfrage an den Server, um die Vorhersage für das Auto zu bekommen
         fetch(`/predict/${carId}`)
             .then(response => response.json())
             .then(data => {
@@ -23,15 +22,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log(`Konfidenz: ${data.confidence.toFixed(2)}%`);
                 }
 
-                // Hintergrundfarbe basierend auf der Vorhersage ändern
-                cardElement.classList.remove('ja', 'nein'); // Entferne vorherige Klassen
+                cardElement.classList.remove('ja', 'nein');
                 if (data.prediction === 'Ja') {
                     cardElement.classList.add('ja');
                 } else if (data.prediction === 'Nein') {
                     cardElement.classList.add('nein');
                 }
 
-                // Sende die Anfrage an den Server, um die Daten für das Auto zu bekommen
                 return fetch(`/get_car?id=${carId}`);
             })
             .then(response => {
@@ -41,30 +38,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                // Title setzen
-                carTitleElement.textContent = data.title; // Titel direkt aus der JSON-Daten
+                carTitleElement.textContent = data.title;
 
-                // Details vorbereiten
                 let carDetails = `
-                    <p><strong>Preis:</strong> ${data.price}</p>
+                    <p><strong>Preis:</strong> ${data.price} €</p>
                     <p><strong>Kilometerstand:</strong> ${data.mileage} km</p>
-                    <p><strong>Leistung (PS):</strong> ${data.power} PS</p>
+                    <p><strong>Leistung (Hubraum):</strong> ${data.power} L</p>
                     <p><strong>Erstzulassung:</strong> ${data.firstRegistration}</p>
                     <p><strong>Getriebe:</strong> ${data.transmission}</p>
-                    <p><strong>Farbe:</strong> ${data.color}</p>
-                    <p><strong>Vorbesitzer:</strong> ${data.owners}</p>
+                    <p><strong>Kraftstofftyp:</strong> ${data.fuel}</p>
+                    <p><strong>Kfz-Steuer:</strong> ${data.tax || 'Keine Angabe'} €</p>
+                    <p><strong>Verbrauch:</strong> ${data.mpg || 'Keine Angabe'} mpg</p>
                 `;
-                carDetailsElement.innerHTML = carDetails; // HTML-Inhalt mit den Details setzen
+                carDetailsElement.innerHTML = carDetails;
 
-                // Bild setzen
-                carImgElement.src = data.image;
+                carImgElement.src = data.image || 'data/gap_filler.jpg';
 
                 loadingOverlay.style.display = 'none'; // Ladeanzeige ausblenden
             })
             .catch(error => {
-                console.error('Fehler beim Laden des Autos:', error);
-                alert('Fehler: Keine weiteren Autos verfügbar.');
-                loadingOverlay.style.display = 'none'; // Ladeanzeige ausblenden
+                console.warn(`Fehler beim Laden von Auto ${carId}:`, error);
+                currentCarId++; // Nächstes Auto versuchen
+                loadCarData(currentCarId);
             });
     }
 

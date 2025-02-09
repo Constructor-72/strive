@@ -1,8 +1,0 @@
-Title: Mercedes AMG GTC
-Price: 130.000€
-Mileage: 68.000
-Power: 557
-First Registration: 06.2019
-Transmission: Automatik
-Color: Schwarz
-Owners: 2

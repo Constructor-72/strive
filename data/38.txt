@@ -1,8 +1,0 @@
-Title: Mercedes CLS400d
-Price: 52.000€
-Mileage: 136.000
-Power: 340
-First Registration: 02.2020
-Transmission: Automatik
-Color: Silber
-Owners: 2

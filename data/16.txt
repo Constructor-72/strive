@@ -1,8 +1,0 @@
-Title: Mercedes C200
-Price: 48.000€
-Mileage: 8.000
-Power: 204
-First Registration: 11.2024
-Transmission: Automatik
-Color: Schwarz
-Owners: 1

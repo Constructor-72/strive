@@ -1,8 +1,0 @@
-Title: Suzuki Swift
-Price: 17.000€
-Mileage: 50.000
-Power: 111
-First Registration: 02.2020
-Transmission: Schaltgetriebe
-Color: Gelb
-Owners: 2

@@ -1,8 +1,0 @@
-Title: VW Käfer
-Price: 18.000€
-Mileage: 93.000
-Power: 34
-First Registration: 01.1981
-Transmission: Schaltgetriebe
-Color: Grün
-Owners: 3

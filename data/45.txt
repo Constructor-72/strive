@@ -1,8 +1,0 @@
-Title: Jeep Wrangler
-Price: 65.000€
-Mileage: 3.000
-Power: 271
-First Registration: 12.2024
-Transmission: Automatik
-Color: Silber
-Owners: 1

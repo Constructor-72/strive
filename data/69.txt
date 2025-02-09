@@ -1,8 +1,0 @@
-Title: Mercedes A45
-Price: 48.000€
-Mileage: 15.000
-Power: 421
-First Registration: 11.2021
-Transmission: Automatik
-Color: Gelb
-Owners: 2

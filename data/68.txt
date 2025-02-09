@@ -1,8 +1,0 @@
-Title: VW Golf R
-Price: 40.000€
-Mileage: 15.000
-Power: 320
-First Registration: 01.2023
-Transmission: Automatik
-Color: Weiß
-Owners: 1

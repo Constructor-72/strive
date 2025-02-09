@@ -1,73 +1,72 @@
 from flask import Flask, send_from_directory, jsonify, request
 import os
 import json
+import pandas as pd
+import random
 from model import model
-from datetime import datetime
 
 app = Flask(__name__, static_folder='.')
 
 DATA_FOLDER = 'data'
 feedback_data = []
 
-# Lade Textdaten und extrahiere die relevanten Informationen
-def load_text_data(file_path):
-    car_data = {}
-    with open(file_path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-        for line in lines:
-            line = line.strip()
-            if line.startswith('Title:'):
-                car_data['title'] = line.replace('Title:', '').strip()
-            elif line.startswith('Price:'):
-                car_data['price'] = line.replace('Price:', '').strip()
-                car_data['price_ml'] = float(car_data['price'].replace('€', '').replace('.', '').strip())
-            elif line.startswith('Mileage:'):
-                car_data['mileage'] = line.replace('Mileage:', '').strip()
-                car_data['mileage_ml'] = int(car_data['mileage'].replace(' km', '').replace('.', '').strip())
-            elif line.startswith('Power:'):
-                car_data['power'] = line.replace('Power:', '').strip()
-                car_data['power_ml'] = int(car_data['power'].replace(' PS', '').strip())
-            elif line.startswith('First Registration:'):
-                car_data['firstRegistration'] = line.replace('First Registration:', '').strip()
-                date_obj = datetime.strptime(car_data['firstRegistration'], '%m.%Y')
-                car_data['firstRegistration_ml'] = date_obj.year * 100 + date_obj.month
-            elif line.startswith('Transmission:'):
-                car_data['transmission'] = line.replace('Transmission:', '').strip()
-                car_data['transmission_ml'] = 1 if car_data['transmission'].lower() == 'automatic' else 0
-            elif line.startswith('Color:'):
-                car_data['color'] = line.replace('Color:', '').strip()
-                car_data['color_ml'] = hash(car_data['color']) % 1000
-            elif line.startswith('Owners:'):
-                car_data['owners'] = line.replace('Owners:', '').strip()
-                car_data['owners_ml'] = int(car_data['owners'])
-    return car_data
+# Einmalige Ladevariable für die CSV-Daten
+dataset = []
 
-# Lade Datensätze
-def load_data():
-    dataset = []
+# Lade CSV-Daten und extrahiere die relevanten Informationen
+def load_csv_data_once():
+    global dataset
+    if dataset:  # Daten sind bereits geladen
+        return dataset
+
+    all_data = []
     for file in os.listdir(DATA_FOLDER):
-        if file.endswith('.txt'):
-            data_id = os.path.splitext(file)[0]
-            image_path = os.path.join(DATA_FOLDER, f"{data_id}.jpg")
-            text_path = os.path.join(DATA_FOLDER, file)
-            if os.path.exists(text_path):
-                car_data = load_text_data(text_path)
-                car_data['id'] = int(data_id)
-                car_data['image'] = image_path if os.path.exists(image_path) else os.path.join(DATA_FOLDER, 'gap_filler.jpg')
-                dataset.append(car_data)
-    
-    # Sortiere Datensätze nach der ID (numerisch)
-    dataset.sort(key=lambda x: x['id'])
+        if file.endswith('.csv'):
+            file_path = os.path.join(DATA_FOLDER, file)
+            df = pd.read_csv(file_path)
+            brand = os.path.splitext(file)[0]  # Extrahiere den Markennamen aus dem Dateinamen
+            df['brand'] = brand  # Füge die Marke als neue Spalte hinzu
+            all_data.append(df)
+
+    # Kombiniere alle DataFrames zu einem großen DataFrame
+    combined_df = pd.concat(all_data, ignore_index=True)
+
+    dataset = []  # Leere die Liste vor dem Neufüllen
+    for index, row in combined_df.iterrows():
+        car_data = {
+            'title': f"{row['brand']} {row['model']}",
+            'price': row['price'],
+            'price_ml': float(row['price']),
+            'mileage': row['mileage'],
+            'mileage_ml': int(row['mileage']),
+            'power': row['engineSize'],
+            'power_ml': float(row['engineSize']),
+            'firstRegistration': row['year'],
+            'firstRegistration_ml': int(row['year']),
+            'transmission': row['transmission'],
+            'transmission_ml': 1 if row['transmission'].lower() == 'automatic' else 0,
+            'fuel': row['fuelType'],
+            'fuel_ml': hash(row['fuelType']) % 1000,
+            'tax': row.get('tax', 0),
+            'mpg': row.get('mpg', 0),
+            'image': row.get('image', 'data/gap_filler.jpg'),
+        }
+        dataset.append(car_data)
+
+    # Mische die Liste zufällig
+    random.shuffle(dataset)
+
+    # Weise die `id`s nach dem Mischen neu zu
+    for idx, car in enumerate(dataset, start=1):
+        car['id'] = idx
+
     return dataset
 
 # API: Nächster Datensatz
 @app.route('/get_car', methods=['GET'])
 def get_car():
-    dataset = load_data()
-    
-    # Verwende den Request-Parameter `id` oder setze ihn auf 1, wenn nicht angegeben
+    dataset = load_csv_data_once()
     current_id = int(request.args.get('id', 1))
-
     car = next((item for item in dataset if item['id'] == current_id), None)
     if car:
         return jsonify(car)
@@ -78,16 +77,24 @@ def get_car():
 @app.route('/feedback', methods=['POST'])
 def feedback():
     data = request.get_json()
-
     if 'car_id' not in data or 'action' not in data:
         return jsonify({'status': 'failure', 'message': 'Missing car_id or action'}), 400
 
     feedback_entry = {'car_id': data['car_id'], 'action': data['action']}
     feedback_data.append(feedback_entry)
 
-    car = next((item for item in load_data() if item['id'] == data['car_id']), None)
+    car = next((item for item in load_csv_data_once() if item['id'] == data['car_id']), None)
     if car:
-        car_features = [car['mileage_ml'], car['power_ml'], car['transmission_ml']]
+        # Überprüfen, dass alle 7 Features übergeben werden
+        car_features = [
+            car['mileage_ml'],           # Kilometerstand
+            car['power_ml'],             # Leistung
+            car['transmission_ml'],      # Getriebe (1 = Automatik, 0 = Manuell)
+            car['fuel_ml'],              # Kraftstofftyp (Hashwert des Kraftstofftyps)
+            car['tax'],                  # Kfz-Steuer
+            car['mpg'],                  # Verbrauch
+            car['firstRegistration_ml']  # Erstzulassung (z. B. 2015)
+        ]
         model.update(car_features, data['action'])
 
     # Speichere Feedback in einer Datei
@@ -99,10 +106,19 @@ def feedback():
 # API: Vorhersage für ein spezifisches Auto
 @app.route('/predict/<int:car_id>', methods=['GET'])
 def predict(car_id):
-    car = next((item for item in load_data() if item['id'] == car_id), None)
+    car = next((item for item in load_csv_data_once() if item['id'] == car_id), None)
     if car:
-        car_features = [car['mileage_ml'], car['power_ml'], car['transmission_ml']]
-        if len(set(model.y)) <= 1 or len(model.X) < model.min_samples:  # Ensure there are at least two classes and enough samples
+        # Alle 7 Merkmale an das Modell übergeben
+        car_features = [
+            car['mileage_ml'],           # Kilometerstand
+            car['power_ml'],             # Leistung
+            car['transmission_ml'],      # Getriebe
+            car['fuel_ml'],              # Kraftstofftyp
+            car['tax'],                  # Kfz-Steuer
+            car['mpg'],                  # Verbrauch
+            car['firstRegistration_ml']  # Erstzulassung
+        ]
+        if len(set(model.y)) <= 1 or len(model.X) < model.min_samples:
             return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.'})
         prediction, confidence = model.predict(car_features)
         return jsonify({'prediction': prediction, 'confidence': confidence})
@@ -119,4 +135,5 @@ def static_files(filename):
     return send_from_directory('.', filename)
 
 if __name__ == '__main__':
+    load_csv_data_once()  # Lade Daten einmalig beim Start
     app.run(debug=True, host='0.0.0.0')

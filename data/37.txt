@@ -1,8 +1,0 @@
-Title: BMW M5
-Price: 69.000€
-Mileage: 43.000
-Power: 625
-First Registration: 01.2018
-Transmission: Automatik
-Color: Gelb
-Owners: 1

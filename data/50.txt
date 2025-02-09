@@ -1,8 +1,0 @@
-Title: Acura Integra
-Price: 35.000€
-Mileage: 5.000
-Power: 182
-First Registration: 03.2022
-Transmission: Schaltgetriebe
-Color: Silber
-Owners: 1

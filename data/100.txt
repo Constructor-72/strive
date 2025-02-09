@@ -1,8 +1,0 @@
-Title: Ford Mondeo
-Price: 11.000€
-Mileage: 168.000
-Power: 160
-First Registration: 07.2016
-Transmission: Schaltgetriebe
-Color: Blau
-Owners: 2

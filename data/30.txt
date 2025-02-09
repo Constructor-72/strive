@@ -1,8 +1,0 @@
-Title: Audi A1
-Price: 26.000€
-Mileage: 23.000
-Power: 110
-First Registration: 11.2023
-Transmission: Automatik
-Color: Grün
-Owners: 1

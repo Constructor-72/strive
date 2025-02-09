@@ -1,8 +1,0 @@
-Title: Mercedes SLK
-Price: 25.000€
-Mileage: 150.000
-Power: 163
-First Registration: 03.2005
-Transmission: Schaltgetriebe
-Color: Gelb
-Owners: 2

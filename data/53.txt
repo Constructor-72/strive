@@ -1,8 +1,0 @@
-Title: Tesla Model 3
-Price: 28.500€
-Mileage: 95.000
-Power: 306
-First Registration: 02.2021
-Transmission: Automatik
-Color: Blau
-Owners: 2
