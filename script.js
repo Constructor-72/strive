@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuDropdown = document.getElementById('menu-dropdown');
     const menuSwipe = document.getElementById('menu-swipe');
     const menuChats = document.getElementById('menu-chats');
+    const menuProfile = document.getElementById('menu-profile');
 
     // Chat-Übersicht-Elemente
     const chatOverview = document.getElementById('chat-overview');
@@ -37,6 +38,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatBtn = document.getElementById('chat-btn');
     const backBtn = document.getElementById('back-btn');
 
+    // Profilfenster-Elemente
+    const profileWindow = document.getElementById('profile-window');
+    const loginForm = document.getElementById('login-form');
+    const profileInfo = document.getElementById('profile-info');
+    const loginUsername = document.getElementById('login-username');
+    const loginPassword = document.getElementById('login-password');
+    const loginBtn = document.getElementById('login-btn');
+    const registerBtn = document.getElementById('register-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const profileUsername = document.getElementById('profile-username');
+
     // Variable zur Speicherung der aktuellen Chat-Auto-ID
     let currentChatCarId = null;
 
@@ -50,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
         menuDropdown.style.display = 'none';
         chatOverview.style.display = 'none';
         chatWindow.style.display = 'none';
+        profileWindow.style.display = 'none';
         cardElement.style.display = 'flex';
         detailView.style.display = 'none';
     });
@@ -60,14 +73,106 @@ document.addEventListener('DOMContentLoaded', function() {
         cardElement.style.display = 'none';
         detailView.style.display = 'none';
         chatWindow.style.display = 'none';
+        profileWindow.style.display = 'none';
         chatOverview.style.display = 'flex';
         loadChatOverview();
+    });
+
+    // Menüpunkt "Mein Profil" klicken
+    menuProfile.addEventListener('click', () => {
+        menuDropdown.style.display = 'none';
+        cardElement.style.display = 'none';
+        detailView.style.display = 'none';
+        chatWindow.style.display = 'none';
+        chatOverview.style.display = 'none';
+        profileWindow.style.display = 'flex';
+        checkLoginStatus();
     });
 
     // Zurück zum Swipen
     backToSwipe.addEventListener('click', () => {
         chatOverview.style.display = 'none';
         cardElement.style.display = 'flex';
+    });
+
+    // Überprüfe den Anmeldestatus
+    function checkLoginStatus() {
+        fetch('/check_login')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Fehler beim Überprüfen des Anmeldestatus');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.logged_in) {
+                    loginForm.style.display = 'none';
+                    profileInfo.style.display = 'block';
+                    profileUsername.textContent = data.username;
+                } else {
+                    loginForm.style.display = 'block';
+                    profileInfo.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Fehler:', error);
+                alert('Fehler beim Überprüfen des Anmeldestatus');
+            });
+    }
+
+    // Anmelden
+    loginBtn.addEventListener('click', () => {
+        const username = loginUsername.value.trim();
+        const password = loginPassword.value.trim();
+        if (username && password) {
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        checkLoginStatus();
+                    } else {
+                        alert('Anmeldung fehlgeschlagen');
+                    }
+                });
+        }
+    });
+
+    // Registrieren
+    registerBtn.addEventListener('click', () => {
+        const username = loginUsername.value.trim();
+        const password = loginPassword.value.trim();
+        if (username && password) {
+            fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Registrierung erfolgreich');
+                    } else {
+                        alert('Registrierung fehlgeschlagen');
+                    }
+                });
+        }
+    });
+
+    // Abmelden
+    logoutBtn.addEventListener('click', () => {
+        fetch('/logout', {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    checkLoginStatus();
+                }
+            });
     });
 
     // Funktion zum Laden der Chat-Übersicht
@@ -120,6 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chatOverview.style.display = 'none';
         cardElement.style.display = 'none';
         detailView.style.display = 'none';
+        profileWindow.style.display = 'none';
         chatWindow.style.display = 'flex';
         loadChatMessages(carId);
     }

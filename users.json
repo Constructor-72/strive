@@ -1,0 +1,28 @@
+{
+    "test": {
+        "password": "test1",
+        "likes": [
+            13
+        ],
+        "dislikes": [
+            11,
+            12
+        ],
+        "chats": []
+    },
+    "test1": {
+        "password": "test1",
+        "likes": [
+            1,
+            3,
+            4,
+            7,
+            8
+        ],
+        "dislikes": [
+            5,
+            9
+        ],
+        "chats": []
+    }
+}

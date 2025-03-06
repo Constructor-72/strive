@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, jsonify, request
+from flask import Flask, send_from_directory, jsonify, request, session
 import os
 import json
 import pandas as pd
@@ -7,9 +7,11 @@ from model import model
 import locale
 
 app = Flask(__name__, static_folder='.')
+app.secret_key = 'your_secret_key'  # Wichtig für die Session-Verwaltung
 
 DATA_FOLDER = 'data'
 CHATS_FILE = 'chats.json'  # Datei zum Speichern der Chats
+USERS_FILE = 'users.json'  # Datei zum Speichern der Benutzer
 feedback_data = []
 
 # Einmalige Ladevariable für die CSV-Daten
@@ -67,6 +69,67 @@ def load_csv_data_once():
 
     return dataset
 
+# Lade Benutzerdaten
+def load_users():
+    if not os.path.exists(USERS_FILE):
+        with open(USERS_FILE, 'w') as f:
+            json.dump({}, f)
+    with open(USERS_FILE, 'r') as f:
+        return json.load(f)
+
+# Speichere Benutzerdaten
+def save_users(users):
+    with open(USERS_FILE, 'w') as f:
+        json.dump(users, f, indent=4)
+
+# API: Registrierung
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    users = load_users()
+    if username in users:
+        return jsonify({'status': 'failure', 'message': 'Benutzername bereits vergeben'}), 400
+
+    users[username] = {
+        'password': password,
+        'likes': [],
+        'dislikes': [],
+        'chats': []
+    }
+    save_users(users)
+    return jsonify({'status': 'success'})
+
+# API: Anmeldung
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    users = load_users()
+    if username not in users or users[username]['password'] != password:
+        return jsonify({'status': 'failure', 'message': 'Ungültige Anmeldedaten'}), 400
+
+    session['username'] = username
+    return jsonify({'status': 'success'})
+
+# API: Abmeldung
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('username', None)
+    return jsonify({'status': 'success'})
+
+# API: Überprüfe den Anmeldestatus
+@app.route('/check_login', methods=['GET'])
+def check_login():
+    if 'username' in session:
+        return jsonify({'logged_in': True, 'username': session['username']})
+    else:
+        return jsonify({'logged_in': False})
+
 # API: Nächster Datensatz
 @app.route('/get_car', methods=['GET'])
 def get_car():
@@ -81,12 +144,20 @@ def get_car():
 # API: Like oder Dislike
 @app.route('/feedback', methods=['POST'])
 def feedback():
+    if 'username' not in session:
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
+
     data = request.get_json()
     if 'car_id' not in data or 'action' not in data:
         return jsonify({'status': 'failure', 'message': 'Missing car_id or action'}), 400
 
-    feedback_entry = {'car_id': data['car_id'], 'action': data['action']}
-    feedback_data.append(feedback_entry)
+    users = load_users()
+    username = session['username']
+    if data['action'] == 'like':
+        users[username]['likes'].append(data['car_id'])
+    elif data['action'] == 'dislike':
+        users[username]['dislikes'].append(data['car_id'])
+    save_users(users)
 
     car = next((item for item in load_csv_data_once() if item['id'] == data['car_id']), None)
     if car:
@@ -101,10 +172,6 @@ def feedback():
             car['firstRegistration_ml']  # Erstzulassung (z. B. 2015)
         ]
         model.update(car_features, data['action'])
-
-    # Speichere Feedback in einer Datei
-    with open('feedback.json', 'w', encoding='utf-8') as f:
-        json.dump(feedback_data, f, indent=4)
 
     return jsonify({'status': 'success'})
 
@@ -132,48 +199,39 @@ def predict(car_id):
 # API: Chat-Nachrichten speichern
 @app.route('/save_chat', methods=['POST'])
 def save_chat():
+    if 'username' not in session:
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
+
     chat_entry = request.get_json()
     if not chat_entry or 'car_id' not in chat_entry or 'message' not in chat_entry:
         return jsonify({'status': 'failure', 'message': 'Invalid chat data'}), 400
 
-    # Lade vorhandene Chats oder erstelle eine neue Liste
-    try:
-        with open(CHATS_FILE, 'r', encoding='utf-8') as f:
-            chats = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        chats = []  # Wenn die Datei nicht existiert oder ungültig ist, erstelle eine leere Liste
-
-    # Füge den neuen Chat hinzu
-    chats.append(chat_entry)
-
-    # Speichere die aktualisierten Chats
-    with open(CHATS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(chats, f, indent=4)
+    users = load_users()
+    username = session['username']
+    users[username]['chats'].append(chat_entry)
+    save_users(users)
 
     return jsonify({'status': 'success'})
 
 # API: Chat-Übersicht laden
 @app.route('/get_chats', methods=['GET'])
 def get_chats():
-    try:
-        with open(CHATS_FILE, 'r', encoding='utf-8') as f:
-            chats = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        chats = []  # Wenn die Datei nicht existiert oder ungültig ist, erstelle eine leere Liste
+    if 'username' not in session:
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
 
-    return jsonify(chats)
+    users = load_users()
+    username = session['username']
+    return jsonify(users[username]['chats'])
 
 # API: Chat-Nachrichten für ein Auto laden
 @app.route('/get_chat_messages/<int:car_id>', methods=['GET'])
 def get_chat_messages(car_id):
-    try:
-        with open(CHATS_FILE, 'r', encoding='utf-8') as f:
-            chats = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        chats = []  # Wenn die Datei nicht existiert oder ungültig ist, erstelle eine leere Liste
+    if 'username' not in session:
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
 
-    # Filtere Nachrichten für das angegebene Auto
-    car_chats = [chat for chat in chats if chat['car_id'] == car_id]
+    users = load_users()
+    username = session['username']
+    car_chats = [chat for chat in users[username]['chats'] if chat['car_id'] == car_id]
     return jsonify(car_chats)
 
 # Hauptseite
