@@ -6,8 +6,21 @@
     <title>Gebrauchtwagensuche</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/png" href="favicon.png">
+    <!-- Hammer.js für Swipe-Gesten -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 </head>
 <body>
+    <!-- Menü-Button -->
+    <div class="menu-button" id="menu-button">☰</div>
+    
+    <!-- Menü-Dropdown -->
+    <div class="menu-dropdown" id="menu-dropdown">
+        <ul>
+            <li id="menu-swipe">Swipen</li>
+            <li id="menu-chats">Chats</li>
+        </ul>
+    </div>
+
     <div class="container">
         <div class="card">
             <!-- Lade-Overlay, das standardmäßig verborgen ist -->
@@ -19,19 +32,61 @@
             <div class="car-image" id="car-image">
                 <img src="" alt="Auto Bild" id="car-img">
             </div>
+
+            <!-- Swipe-Indikator -->
+            <div class="swipe-indicator" id="swipe-indicator"></div>
+
             <div class="car-info" id="car-info">
                 <h2 id="car-title">Auto Details</h2>
-                <p id="car-details">
-                </p>
+                <div id="car-details"></div>
             </div>
             
             <!-- Vorhersage-Anzeige -->
-            <div id="prediction" style="font-weight: bold;"></div> <!-- Anzeige der Vorhersage -->
+            <div id="prediction" style="font-weight: bold;"></div>
+        </div>
+    </div>
 
-            <div class="actions">
-                <button class="btn like" id="like-btn">Like</button>
-                <button class="btn dislike" id="dislike-btn">Dislike</button>
+    <!-- Detailansicht (standardmäßig ausgeblendet) -->
+    <div id="detail-view" class="detail-view" style="display: none;">
+        <div class="detail-container">
+            <h2 id="detail-title"></h2>
+            <img id="detail-image" src="" alt="Auto Bild">
+            <div id="detail-info" class="detail-info">
+                <div class="left">
+                    <p><strong>Preis:</strong> <span id="detail-price"></span> €</p>
+                    <p><strong>Kilometerstand:</strong> <span id="detail-mileage"></span> km</p>
+                    <p><strong>Hubraum:</strong> <span id="detail-power"></span> L</p>
+                    <p><strong>Erstzulassung:</strong> <span id="detail-registration"></span></p>
+                </div>
+                <div class="right">
+                    <p><strong>Getriebe:</strong> <span id="detail-transmission"></span></p>
+                    <p><strong>Kraftstofftyp:</strong> <span id="detail-fuel"></span></p>
+                    <p><strong>Kfz-Steuer:</strong> <span id="detail-tax"></span> €</p>
+                    <p><strong>Verbrauch:</strong> <span id="detail-mpg"></span> mpg</p>
+                </div>
             </div>
+            <button id="chat-btn" class="btn">Chat starten</button>
+            <button id="back-btn" class="btn">Zurück</button>
+        </div>
+    </div>
+
+    <!-- Chatfenster (standardmäßig ausgeblendet) -->
+    <div id="chat-window" class="chat-window" style="display: none;">
+        <div class="chat-container">
+            <h2>Chat mit Verkäufer</h2>
+            <div id="chat-messages"></div>
+            <textarea id="chat-input" placeholder="Schreibe eine Nachricht..."></textarea>
+            <button id="send-btn" class="btn">Senden</button>
+            <button id="close-chat-btn" class="btn">Schließen</button>
+        </div>
+    </div>
+
+    <!-- Chat-Übersicht (standardmäßig ausgeblendet) -->
+    <div id="chat-overview" class="chat-overview" style="display: none;">
+        <div class="chat-overview-container">
+            <h2>Chats</h2>
+            <div id="chat-list"></div>
+            <button id="back-to-swipe" class="btn">Zurück zum Swipen</button>
         </div>
     </div>
 

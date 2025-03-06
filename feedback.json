@@ -1,11 +1,19 @@
 [
     {
         "car_id": 1,
-        "action": "like"
+        "action": "dislike"
     },
     {
         "car_id": 2,
         "action": "like"
+    },
+    {
+        "car_id": 1,
+        "action": "like"
+    },
+    {
+        "car_id": 2,
+        "action": "dislike"
     },
     {
         "car_id": 3,
@@ -13,298 +21,66 @@
     },
     {
         "car_id": 4,
-        "action": "like"
+        "action": "dislike"
     },
     {
         "car_id": 5,
         "action": "dislike"
     },
     {
-        "car_id": 6,
+        "car_id": 1,
+        "action": "like"
+    },
+    {
+        "car_id": 1,
+        "action": "like"
+    },
+    {
+        "car_id": 2,
         "action": "dislike"
     },
     {
-        "car_id": 7,
+        "car_id": 1,
         "action": "like"
     },
     {
-        "car_id": 9,
+        "car_id": 1,
         "action": "like"
     },
     {
-        "car_id": 10,
-        "action": "like"
-    },
-    {
-        "car_id": 11,
-        "action": "like"
-    },
-    {
-        "car_id": 13,
-        "action": "like"
-    },
-    {
-        "car_id": 14,
-        "action": "like"
-    },
-    {
-        "car_id": 15,
+        "car_id": 2,
         "action": "dislike"
     },
     {
-        "car_id": 17,
-        "action": "like"
-    },
-    {
-        "car_id": 18,
-        "action": "like"
-    },
-    {
-        "car_id": 19,
-        "action": "like"
-    },
-    {
-        "car_id": 20,
-        "action": "like"
-    },
-    {
-        "car_id": 21,
-        "action": "like"
-    },
-    {
-        "car_id": 23,
-        "action": "like"
-    },
-    {
-        "car_id": 25,
-        "action": "like"
-    },
-    {
-        "car_id": 27,
+        "car_id": 3,
         "action": "dislike"
     },
     {
-        "car_id": 28,
-        "action": "like"
-    },
-    {
-        "car_id": 32,
-        "action": "like"
-    },
-    {
-        "car_id": 33,
-        "action": "like"
-    },
-    {
-        "car_id": 34,
+        "car_id": 4,
         "action": "dislike"
     },
     {
-        "car_id": 36,
+        "car_id": 5,
         "action": "like"
     },
     {
-        "car_id": 37,
+        "car_id": 1,
         "action": "like"
     },
     {
-        "car_id": 38,
+        "car_id": 2,
         "action": "dislike"
     },
     {
-        "car_id": 39,
+        "car_id": 3,
         "action": "like"
     },
     {
-        "car_id": 40,
+        "car_id": 1,
+        "action": "like"
+    },
+    {
+        "car_id": 1,
         "action": "dislike"
-    },
-    {
-        "car_id": 41,
-        "action": "like"
-    },
-    {
-        "car_id": 42,
-        "action": "like"
-    },
-    {
-        "car_id": 43,
-        "action": "like"
-    },
-    {
-        "car_id": 44,
-        "action": "like"
-    },
-    {
-        "car_id": 46,
-        "action": "like"
-    },
-    {
-        "car_id": 49,
-        "action": "like"
-    },
-    {
-        "car_id": 50,
-        "action": "like"
-    },
-    {
-        "car_id": 52,
-        "action": "like"
-    },
-    {
-        "car_id": 53,
-        "action": "like"
-    },
-    {
-        "car_id": 54,
-        "action": "like"
-    },
-    {
-        "car_id": 55,
-        "action": "like"
-    },
-    {
-        "car_id": 56,
-        "action": "like"
-    },
-    {
-        "car_id": 57,
-        "action": "like"
-    },
-    {
-        "car_id": 58,
-        "action": "like"
-    },
-    {
-        "car_id": 60,
-        "action": "like"
-    },
-    {
-        "car_id": 61,
-        "action": "like"
-    },
-    {
-        "car_id": 62,
-        "action": "like"
-    },
-    {
-        "car_id": 65,
-        "action": "like"
-    },
-    {
-        "car_id": 67,
-        "action": "like"
-    },
-    {
-        "car_id": 68,
-        "action": "like"
-    },
-    {
-        "car_id": 69,
-        "action": "like"
-    },
-    {
-        "car_id": 70,
-        "action": "like"
-    },
-    {
-        "car_id": 72,
-        "action": "like"
-    },
-    {
-        "car_id": 73,
-        "action": "like"
-    },
-    {
-        "car_id": 74,
-        "action": "like"
-    },
-    {
-        "car_id": 75,
-        "action": "like"
-    },
-    {
-        "car_id": 76,
-        "action": "like"
-    },
-    {
-        "car_id": 78,
-        "action": "like"
-    },
-    {
-        "car_id": 79,
-        "action": "like"
-    },
-    {
-        "car_id": 80,
-        "action": "like"
-    },
-    {
-        "car_id": 83,
-        "action": "like"
-    },
-    {
-        "car_id": 84,
-        "action": "dislike"
-    },
-    {
-        "car_id": 86,
-        "action": "like"
-    },
-    {
-        "car_id": 87,
-        "action": "like"
-    },
-    {
-        "car_id": 88,
-        "action": "like"
-    },
-    {
-        "car_id": 90,
-        "action": "like"
-    },
-    {
-        "car_id": 91,
-        "action": "like"
-    },
-    {
-        "car_id": 93,
-        "action": "like"
-    },
-    {
-        "car_id": 95,
-        "action": "like"
-    },
-    {
-        "car_id": 96,
-        "action": "like"
-    },
-    {
-        "car_id": 97,
-        "action": "like"
-    },
-    {
-        "car_id": 99,
-        "action": "dislike"
-    },
-    {
-        "car_id": 101,
-        "action": "like"
-    },
-    {
-        "car_id": 102,
-        "action": "like"
-    },
-    {
-        "car_id": 103,
-        "action": "like"
-    },
-    {
-        "car_id": 104,
-        "action": "like"
-    },
-    {
-        "car_id": 105,
-        "action": "like"
     }
 ]

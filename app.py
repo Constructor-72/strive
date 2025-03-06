@@ -9,6 +9,7 @@ import locale
 app = Flask(__name__, static_folder='.')
 
 DATA_FOLDER = 'data'
+CHATS_FILE = 'chats.json'  # Datei zum Speichern der Chats
 feedback_data = []
 
 # Einmalige Ladevariable für die CSV-Daten
@@ -127,6 +128,53 @@ def predict(car_id):
         prediction, confidence = model.predict(car_features)
         return jsonify({'prediction': prediction, 'confidence': confidence})
     return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.'})
+
+# API: Chat-Nachrichten speichern
+@app.route('/save_chat', methods=['POST'])
+def save_chat():
+    chat_entry = request.get_json()
+    if not chat_entry or 'car_id' not in chat_entry or 'message' not in chat_entry:
+        return jsonify({'status': 'failure', 'message': 'Invalid chat data'}), 400
+
+    # Lade vorhandene Chats oder erstelle eine neue Liste
+    try:
+        with open(CHATS_FILE, 'r', encoding='utf-8') as f:
+            chats = json.load(f)
+    except FileNotFoundError:
+        chats = []
+
+    # Füge den neuen Chat hinzu
+    chats.append(chat_entry)
+
+    # Speichere die aktualisierten Chats
+    with open(CHATS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(chats, f, indent=4)
+
+    return jsonify({'status': 'success'})
+
+# API: Chat-Übersicht laden
+@app.route('/get_chats', methods=['GET'])
+def get_chats():
+    try:
+        with open(CHATS_FILE, 'r', encoding='utf-8') as f:
+            chats = json.load(f)
+    except FileNotFoundError:
+        chats = []
+
+    return jsonify(chats)
+
+# API: Chat-Nachrichten für ein Auto laden
+@app.route('/get_chat_messages/<int:car_id>', methods=['GET'])
+def get_chat_messages(car_id):
+    try:
+        with open(CHATS_FILE, 'r', encoding='utf-8') as f:
+            chats = json.load(f)
+    except FileNotFoundError:
+        chats = []
+
+    # Filtere Nachrichten für das angegebene Auto
+    car_chats = [chat for chat in chats if chat['car_id'] == car_id]
+    return jsonify(car_chats)
 
 # Hauptseite
 @app.route('/')
