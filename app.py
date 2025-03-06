@@ -3,7 +3,7 @@ import os
 import json
 import pandas as pd
 import random
-from model import model
+from model import CarPredictionModel
 import locale
 
 app = Flask(__name__, static_folder='.')
@@ -16,6 +16,9 @@ feedback_data = []
 
 # Einmalige Ladevariable für die CSV-Daten
 dataset = []
+
+# Globale Variable zur Speicherung der Modelle aller Benutzer
+user_models = {}
 
 # Setze die lokale Umgebung auf Deutsch, um die Tausendertrennung korrekt zu formatieren
 locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
@@ -153,12 +156,19 @@ def feedback():
 
     users = load_users()
     username = session['username']
+
+    # Lade das Modell des Benutzers
+    if username not in user_models:
+        user_models[username] = CarPredictionModel()
+
+    # Aktualisiere Likes/Dislikes in der Benutzerdatenbank
     if data['action'] == 'like':
         users[username]['likes'].append(data['car_id'])
     elif data['action'] == 'dislike':
         users[username]['dislikes'].append(data['car_id'])
     save_users(users)
 
+    # Lade die Auto-Daten
     car = next((item for item in load_csv_data_once() if item['id'] == data['car_id']), None)
     if car:
         # Überprüfen, dass alle 7 Features übergeben werden
@@ -171,13 +181,21 @@ def feedback():
             car['mpg'],                  # Verbrauch
             car['firstRegistration_ml']  # Erstzulassung (z. B. 2015)
         ]
-        model.update(car_features, data['action'])
+        # Aktualisiere das Modell des Benutzers
+        user_models[username].update(car_features, data['action'])
 
     return jsonify({'status': 'success'})
 
 # API: Vorhersage für ein spezifisches Auto
 @app.route('/predict/<int:car_id>', methods=['GET'])
 def predict(car_id):
+    if 'username' not in session:
+        return jsonify({'prediction': 'Nicht angemeldet'}), 401
+
+    username = session['username']
+    if username not in user_models:
+        return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.', 'confidence': None})
+
     car = next((item for item in load_csv_data_once() if item['id'] == car_id), None)
     if car:
         # Alle 7 Merkmale an das Modell übergeben
@@ -190,11 +208,10 @@ def predict(car_id):
             car['mpg'],                  # Verbrauch
             car['firstRegistration_ml']  # Erstzulassung
         ]
-        if len(set(model.y)) <= 1 or len(model.X) < model.min_samples:
-            return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.'})
-        prediction, confidence = model.predict(car_features)
+        prediction, confidence = user_models[username].predict(car_features)
         return jsonify({'prediction': prediction, 'confidence': confidence})
-    return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.'})
+    return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.', 'confidence': None})
+
 
 # API: Chat-Nachrichten speichern
 @app.route('/save_chat', methods=['POST'])

@@ -8,8 +8,8 @@ from sklearn.preprocessing import StandardScaler
 class CarPredictionModel:
     def __init__(self):
         self.model = self._build_model()
-        self.X = []
-        self.y = []
+        self.X = []  # Features
+        self.y = []  # Labels (1 = Like, 0 = Dislike)
         self.min_samples = 5  # Mindestanzahl an Bewertungen
         self.scaler = StandardScaler()
 
@@ -39,7 +39,8 @@ class CarPredictionModel:
     def predict(self, car_features):
         # Prüfen, ob das Modell ausreichend trainiert wurde
         if len(set(self.y)) <= 1 or len(self.X) < self.min_samples:
-            return 'Keine eindeutige Vorhersage möglich.', None
+            return 'Keine eindeutige Vorhersage möglich.', None  # Rückgabe von None für die Konfidenz
+
         car_features_scaled = self.scaler.transform(np.array([car_features]))
         prediction = self.model.predict(car_features_scaled)[0][0]
         confidence = prediction if prediction >= 0.5 else 1 - prediction
@@ -51,4 +52,5 @@ class CarPredictionModel:
         self.y.append(1 if feedback == 'like' else 0)
         self.train()
 
-model = CarPredictionModel()
+# Globale Variable zur Speicherung der Modelle aller Benutzer
+user_models = {}
