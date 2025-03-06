@@ -1,58 +1,10 @@
 [
     {
         "car_id": 1,
-        "action": "dislike"
-    },
-    {
-        "car_id": 2,
-        "action": "like"
-    },
-    {
-        "car_id": 1,
         "action": "like"
     },
     {
         "car_id": 2,
-        "action": "dislike"
-    },
-    {
-        "car_id": 3,
-        "action": "like"
-    },
-    {
-        "car_id": 4,
-        "action": "dislike"
-    },
-    {
-        "car_id": 5,
-        "action": "dislike"
-    },
-    {
-        "car_id": 1,
-        "action": "like"
-    },
-    {
-        "car_id": 1,
-        "action": "like"
-    },
-    {
-        "car_id": 2,
-        "action": "dislike"
-    },
-    {
-        "car_id": 1,
-        "action": "like"
-    },
-    {
-        "car_id": 1,
-        "action": "like"
-    },
-    {
-        "car_id": 2,
-        "action": "dislike"
-    },
-    {
-        "car_id": 3,
         "action": "dislike"
     },
     {
@@ -64,6 +16,10 @@
         "action": "like"
     },
     {
+        "car_id": 6,
+        "action": "dislike"
+    },
+    {
         "car_id": 1,
         "action": "like"
     },
@@ -72,15 +28,11 @@
         "action": "dislike"
     },
     {
-        "car_id": 3,
-        "action": "like"
-    },
-    {
-        "car_id": 1,
-        "action": "like"
-    },
-    {
-        "car_id": 1,
+        "car_id": 4,
         "action": "dislike"
+    },
+    {
+        "car_id": 5,
+        "action": "like"
     }
 ]

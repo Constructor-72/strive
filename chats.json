@@ -1,7 +1,37 @@
 [
     {
         "car_id": 1,
-        "message": "tetas",
-        "timestamp": "6.3.2025, 00:52:02"
+        "message": "hallo123",
+        "timestamp": "6.3.2025, 01:41:04"
+    },
+    {
+        "car_id": 6,
+        "message": "Test_VX",
+        "timestamp": "6.3.2025, 01:41:33"
+    },
+    {
+        "car_id": 1,
+        "message": "234",
+        "timestamp": "6.3.2025, 01:41:57"
+    },
+    {
+        "car_id": 6,
+        "message": "funktioniert",
+        "timestamp": "6.3.2025, 01:42:11"
+    },
+    {
+        "car_id": 7,
+        "message": "isdafo",
+        "timestamp": "6.3.2025, 01:42:18"
+    },
+    {
+        "car_id": 1,
+        "message": "das",
+        "timestamp": "6.3.2025, 01:52:01"
+    },
+    {
+        "car_id": 6,
+        "message": "Teststh",
+        "timestamp": "6.3.2025, 01:53:25"
     }
 ]

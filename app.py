@@ -140,8 +140,8 @@ def save_chat():
     try:
         with open(CHATS_FILE, 'r', encoding='utf-8') as f:
             chats = json.load(f)
-    except FileNotFoundError:
-        chats = []
+    except (FileNotFoundError, json.JSONDecodeError):
+        chats = []  # Wenn die Datei nicht existiert oder ungültig ist, erstelle eine leere Liste
 
     # Füge den neuen Chat hinzu
     chats.append(chat_entry)
@@ -158,8 +158,8 @@ def get_chats():
     try:
         with open(CHATS_FILE, 'r', encoding='utf-8') as f:
             chats = json.load(f)
-    except FileNotFoundError:
-        chats = []
+    except (FileNotFoundError, json.JSONDecodeError):
+        chats = []  # Wenn die Datei nicht existiert oder ungültig ist, erstelle eine leere Liste
 
     return jsonify(chats)
 
@@ -169,8 +169,8 @@ def get_chat_messages(car_id):
     try:
         with open(CHATS_FILE, 'r', encoding='utf-8') as f:
             chats = json.load(f)
-    except FileNotFoundError:
-        chats = []
+    except (FileNotFoundError, json.JSONDecodeError):
+        chats = []  # Wenn die Datei nicht existiert oder ungültig ist, erstelle eine leere Liste
 
     # Filtere Nachrichten für das angegebene Auto
     car_chats = [chat for chat in chats if chat['car_id'] == car_id]
@@ -187,5 +187,10 @@ def static_files(filename):
     return send_from_directory('.', filename)
 
 if __name__ == '__main__':
+    # Stelle sicher, dass die chats.json-Datei existiert und ein gültiges JSON-Array enthält
+    if not os.path.exists(CHATS_FILE):
+        with open(CHATS_FILE, 'w', encoding='utf-8') as f:
+            json.dump([], f)  # Erstelle eine leere JSON-Array-Datei
+
     load_csv_data_once()  # Lade Daten einmalig beim Start
     app.run(debug=True, host='0.0.0.0')

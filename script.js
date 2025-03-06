@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatBtn = document.getElementById('chat-btn');
     const backBtn = document.getElementById('back-btn');
 
+    // Variable zur Speicherung der aktuellen Chat-Auto-ID
+    let currentChatCarId = null;
+
     // Menü-Button klicken
     menuButton.addEventListener('click', () => {
         menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
@@ -113,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funktion zum Öffnen eines Chats
     function openChat(carId) {
+        currentChatCarId = carId; // Setze die aktuelle Chat-Auto-ID
         chatOverview.style.display = 'none';
         cardElement.style.display = 'none';
         detailView.style.display = 'none';
@@ -125,11 +129,13 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/get_chat_messages/${carId}`)
             .then(response => response.json())
             .then(data => {
-                chatMessages.innerHTML = '';
+                chatMessages.innerHTML = ''; // Leere die Nachrichten vor dem Laden
                 data.forEach(chat => {
-                    const messageElement = document.createElement('div');
-                    messageElement.textContent = `Ich: ${chat.message}`;
-                    chatMessages.appendChild(messageElement);
+                    if (chat.car_id === carId) { // Nur Nachrichten für das aktuelle Auto anzeigen
+                        const messageElement = document.createElement('div');
+                        messageElement.textContent = `Ich: ${chat.message}`;
+                        chatMessages.appendChild(messageElement);
+                    }
                 });
             })
             .catch(error => {
@@ -141,6 +147,41 @@ document.addEventListener('DOMContentLoaded', function() {
     closeChatBtn.addEventListener('click', () => {
         chatWindow.style.display = 'none';
         chatOverview.style.display = 'flex';
+    });
+
+    // Nachricht senden
+    sendBtn.addEventListener('click', () => {
+        const message = chatInput.value.trim();
+        if (message && currentChatCarId) { // Nur senden, wenn eine Nachricht und eine gültige Auto-ID vorhanden sind
+            const chatEntry = {
+                car_id: currentChatCarId, // Verwende die aktuelle Chat-Auto-ID
+                message: message,
+                timestamp: new Date().toLocaleString()
+            };
+
+            // Nachricht speichern
+            fetch('/save_chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(chatEntry)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Chat gespeichert:', data);
+                    // Nachricht im Chatfenster anzeigen
+                    const messageElement = document.createElement('div');
+                    messageElement.textContent = `Ich: ${message}`;
+                    chatMessages.appendChild(messageElement);
+                    chatInput.value = ''; // Eingabefeld leeren
+                })
+                .catch(error => {
+                    console.error('Fehler beim Speichern des Chats:', error);
+                });
+        } else {
+            console.warn('Nachricht oder Auto-ID fehlt.');
+            console.log('Aktuelle Chat-Auto-ID:', currentChatCarId);
+            console.log('Nachricht:', message);
+        }
     });
 
     // Funktion zum Laden eines neuen Autos
@@ -277,43 +318,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Chatfenster öffnen
     chatBtn.addEventListener('click', () => {
+        currentChatCarId = currentCarId; // Setze die aktuelle Chat-Auto-ID auf die aktuelle Auto-ID
         chatWindow.style.display = 'flex';
-    });
-
-    // Chatfenster schließen
-    closeChatBtn.addEventListener('click', () => {
-        chatWindow.style.display = 'none';
-    });
-
-    // Nachricht senden
-    sendBtn.addEventListener('click', () => {
-        const message = chatInput.value.trim();
-        if (message) {
-            const chatEntry = {
-                car_id: currentCarId,
-                message: message,
-                timestamp: new Date().toLocaleString()
-            };
-
-            // Nachricht speichern
-            fetch('/save_chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(chatEntry)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Chat gespeichert:', data);
-                    // Nachricht im Chatfenster anzeigen
-                    const messageElement = document.createElement('div');
-                    messageElement.textContent = `Ich: ${message}`;
-                    chatMessages.appendChild(messageElement);
-                    chatInput.value = ''; // Eingabefeld leeren
-                })
-                .catch(error => {
-                    console.error('Fehler beim Speichern des Chats:', error);
-                });
-        }
+        loadChatMessages(currentChatCarId);
     });
 
     // Hammer.js für Swipe-Gesten
