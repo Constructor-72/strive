@@ -213,7 +213,9 @@ html, body {
     z-index: 1000;
 }
 
+/* Profil-Container */
 .profile-container {
+    position: relative; /* Wichtig für die Positionierung des Close-Buttons */
     background: white;
     padding: 20px;
     border-radius: 10px;
@@ -222,8 +224,23 @@ html, body {
     text-align: center;
 }
 
+/* Schließen-Button (X) im Profil-Container */
+.close-profile-btn {
+    position: absolute; /* Positioniert relativ zum Container */
+    top: 10px; /* Abstand vom oberen Rand des Containers */
+    right: 10px; /* Abstand vom rechten Rand des Containers */
+    width: 24px; /* Größe des Symbols */
+    height: 24px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.close-profile-btn:hover {
+    opacity: 0.7; /* Leichte Transparenz beim Hover */
+}
+
 .profile-container input {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ddd;

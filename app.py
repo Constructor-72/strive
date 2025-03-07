@@ -5,6 +5,7 @@ import pandas as pd
 import random
 from model import CarPredictionModel
 import locale
+import bcrypt  # Importiere bcrypt für das Hashen von Passwörtern
 
 app = Flask(__name__, static_folder='.')
 app.secret_key = 'your_secret_key'  # Wichtig für die Session-Verwaltung
@@ -96,8 +97,11 @@ def register():
     if username in users:
         return jsonify({'status': 'failure', 'message': 'Benutzername bereits vergeben'}), 400
 
+    # Hash das Passwort
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
     users[username] = {
-        'password': password,
+        'password': hashed_password,  # Speichere das gehashte Passwort
         'likes': [],
         'dislikes': [],
         'chats': []
@@ -113,11 +117,16 @@ def login():
     password = data.get('password')
 
     users = load_users()
-    if username not in users or users[username]['password'] != password:
+    if username not in users:
         return jsonify({'status': 'failure', 'message': 'Ungültige Anmeldedaten'}), 400
 
-    session['username'] = username
-    return jsonify({'status': 'success'})
+    # Überprüfe das Passwort
+    hashed_password = users[username]['password'].encode('utf-8')
+    if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+        session['username'] = username
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'failure', 'message': 'Ungültige Anmeldedaten'}), 400
 
 # API: Abmeldung
 @app.route('/logout', methods=['POST'])
@@ -147,26 +156,27 @@ def get_car():
 # API: Like oder Dislike
 @app.route('/feedback', methods=['POST'])
 def feedback():
-    if 'username' not in session:
-        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
+    username = session.get('username', 'guest')  # Standard-Nutzer 'guest' verwenden
 
     data = request.get_json()
     if 'car_id' not in data or 'action' not in data:
         return jsonify({'status': 'failure', 'message': 'Missing car_id or action'}), 400
 
     users = load_users()
-    username = session['username']
+    if username not in users and username != 'guest':
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
 
     # Lade das Modell des Benutzers
     if username not in user_models:
         user_models[username] = CarPredictionModel()
 
-    # Aktualisiere Likes/Dislikes in der Benutzerdatenbank
-    if data['action'] == 'like':
-        users[username]['likes'].append(data['car_id'])
-    elif data['action'] == 'dislike':
-        users[username]['dislikes'].append(data['car_id'])
-    save_users(users)
+    # Aktualisiere Likes/Dislikes in der Benutzerdatenbank (nur für registrierte Benutzer)
+    if username != 'guest':
+        if data['action'] == 'like':
+            users[username]['likes'].append(data['car_id'])
+        elif data['action'] == 'dislike':
+            users[username]['dislikes'].append(data['car_id'])
+        save_users(users)
 
     # Lade die Auto-Daten
     car = next((item for item in load_csv_data_once() if item['id'] == data['car_id']), None)
@@ -189,10 +199,8 @@ def feedback():
 # API: Vorhersage für ein spezifisches Auto
 @app.route('/predict/<int:car_id>', methods=['GET'])
 def predict(car_id):
-    if 'username' not in session:
-        return jsonify({'prediction': 'Nicht angemeldet'}), 401
+    username = session.get('username', 'guest')  # Standard-Nutzer 'guest' verwenden
 
-    username = session['username']
     if username not in user_models:
         return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.', 'confidence': None})
 
@@ -211,7 +219,6 @@ def predict(car_id):
         prediction, confidence = user_models[username].predict(car_features)
         return jsonify({'prediction': prediction, 'confidence': confidence})
     return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.', 'confidence': None})
-
 
 # API: Chat-Nachrichten speichern
 @app.route('/save_chat', methods=['POST'])

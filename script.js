@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentCarId = 1; // Start-Id für das erste Auto
     let carCounter = 0; // Zählt die Anzahl der geladenen Autos
     let cachedCars = []; // Cache für Auto-Daten
+    let chatOpenedFrom = null; // Speichert, von wo aus der Chat geöffnet wurde ('detail' oder 'overview')
 
     // Elemente
     const carImgElement = document.getElementById('car-img');
@@ -48,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerBtn = document.getElementById('register-btn');
     const logoutBtn = document.getElementById('logout-btn');
     const profileUsername = document.getElementById('profile-username');
+    const closeProfileBtn = document.getElementById('close-profile-btn'); // Schließen-Button (X)
 
     // Variable zur Speicherung der aktuellen Chat-Auto-ID
     let currentChatCarId = null;
@@ -95,6 +97,12 @@ document.addEventListener('DOMContentLoaded', function() {
         cardElement.style.display = 'flex';
     });
 
+    // Schließen-Button (X) im Profilfenster
+    closeProfileBtn.addEventListener('click', () => {
+        profileWindow.style.display = 'none'; // Verstecke das Profilfenster
+        cardElement.style.display = 'flex'; // Zeige den Swipen-Bereich an
+    });
+
     // Überprüfe den Anmeldestatus
     function checkLoginStatus() {
         fetch('/check_login')
@@ -112,6 +120,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     loginForm.style.display = 'block';
                     profileInfo.style.display = 'none';
+                    // Standard-Nutzer verwenden
+                    sessionStorage.setItem('username', 'guest');
+                    profileUsername.textContent = 'Gast';
                 }
             })
             .catch(error => {
@@ -133,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        checkLoginStatus();
+                        window.location.reload(); // Seite neu laden
                     } else {
                         alert('Anmeldung fehlgeschlagen');
                     }
@@ -154,7 +165,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        alert('Registrierung erfolgreich');
+                        // Automatische Anmeldung nach der Registrierung
+                        fetch('/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username, password })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    window.location.reload(); // Seite neu laden
+                                } else {
+                                    alert('Automatische Anmeldung fehlgeschlagen');
+                                }
+                            });
                     } else {
                         alert('Registrierung fehlgeschlagen');
                     }
@@ -170,7 +194,17 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    checkLoginStatus();
+                    // Verstecke alle anderen Bereiche und zeige den Anmeldebildschirm an
+                    cardElement.style.display = 'none'; // Swipen ausblenden
+                    detailView.style.display = 'none'; // Detailansicht ausblenden
+                    chatWindow.style.display = 'none'; // Chatfenster ausblenden
+                    chatOverview.style.display = 'none'; // Chat-Übersicht ausblenden
+                    profileWindow.style.display = 'flex'; // Anmeldebildschirm anzeigen
+
+                    // Setze das Anmeldeformular zurück
+                    loginUsername.value = '';
+                    loginPassword.value = '';
+                    checkLoginStatus(); // Aktualisiere den Anmeldestatus
                 }
             });
     });
@@ -204,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             chatEntry.appendChild(carTitle);
 
                             // Klick-Event zum Öffnen des Chats
-                            chatEntry.addEventListener('click', () => openChat(carId));
+                            chatEntry.addEventListener('click', () => openChat(carId, 'overview')); // Öffne den Chat aus der Chat-Übersicht
 
                             // Füge den Chat-Eintrag zur Liste hinzu
                             chatList.appendChild(chatEntry);
@@ -220,13 +254,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Funktion zum Öffnen eines Chats
-    function openChat(carId) {
+    function openChat(carId, from) {
         currentChatCarId = carId; // Setze die aktuelle Chat-Auto-ID
-        chatOverview.style.display = 'none';
-        cardElement.style.display = 'none';
-        detailView.style.display = 'none';
-        profileWindow.style.display = 'none';
-        chatWindow.style.display = 'flex';
+        chatOpenedFrom = from; // Speichere, von wo aus der Chat geöffnet wurde
+
+        if (from === 'detail') {
+            detailView.style.display = 'none'; // Verstecke die Detailansicht
+        } else if (from === 'overview') {
+            chatOverview.style.display = 'none'; // Verstecke die Chat-Übersicht
+        }
+
+        chatWindow.style.display = 'flex'; // Zeige das Chatfenster an
         loadChatMessages(carId);
     }
 
@@ -249,10 +287,18 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Chatfenster schließen und zurück zur Chat-Übersicht
+    // Chatfenster schließen
     closeChatBtn.addEventListener('click', () => {
-        chatWindow.style.display = 'none';
-        chatOverview.style.display = 'flex';
+        chatWindow.style.display = 'none'; // Verstecke das Chatfenster
+
+        // Entscheide, wohin der Benutzer zurückkehren soll
+        if (chatOpenedFrom === 'detail') {
+            detailView.style.display = 'flex'; // Zeige die Detailansicht an
+        } else if (chatOpenedFrom === 'overview') {
+            chatOverview.style.display = 'flex'; // Zeige die Chat-Übersicht an
+        }
+
+        chatOpenedFrom = null; // Setze den Zustand zurück
     });
 
     // Nachricht senden
@@ -293,14 +339,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Funktion zum Laden eines neuen Autos
     function loadCarData(carId) {
         loadingOverlay.style.display = 'flex'; // Ladeanzeige aktivieren
-    
+
         // Überprüfen, ob das Auto bereits im Cache ist
         const cachedCar = cachedCars.find(car => car.id === carId);
         if (cachedCar) {
             displayCarData(cachedCar);
             return;
         }
-    
+
         // Auto-Daten vom Server laden
         fetch(`/predict/${carId}`)
             .then(response => {
@@ -311,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 console.log(`Vorhersage für Auto ${carId}:`, data.prediction);
-    
+
                 // Überprüfen, ob eine Vorhersage möglich war
                 if (data.prediction === 'Keine eindeutige Vorhersage möglich.') {
                     console.warn('Keine Vorhersage möglich, da das Modell noch nicht genügend Daten hat.');
@@ -321,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (data.confidence !== undefined) {
                     console.log(`Konfidenz: ${data.confidence.toFixed(2)}%`);
                 }
-    
+
                 // Immer Klassen hinzufügen, aber Farben erst nach 30 Autos aktivieren
                 cardElement.classList.remove('ja', 'nein');
                 if (data.prediction === 'Ja') {
@@ -329,15 +375,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (data.prediction === 'Nein') {
                     cardElement.classList.add('nein');
                 }
-    
+
                 // Zähler erhöhen
                 carCounter++;
-    
+
                 // Falls 30 Autos geladen wurden, Klasse für sichtbare Farben aktivieren
                 if (carCounter >= 30) {
                     cardElement.classList.add('visible-colors');
                 }
-    
+
                 return fetch(`/get_car?id=${carId}`);
             })
             .then(response => {
@@ -357,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadCarData(currentCarId);
             });
     }
-    
+
     // Funktion zum Anzeigen der Auto-Daten
     function displayCarData(data) {
         carTitleElement.textContent = data.title;
@@ -437,8 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Chatfenster öffnen
     chatBtn.addEventListener('click', () => {
         currentChatCarId = currentCarId; // Setze die aktuelle Chat-Auto-ID auf die aktuelle Auto-ID
-        chatWindow.style.display = 'flex';
-        loadChatMessages(currentChatCarId);
+        openChat(currentChatCarId, 'detail'); // Öffne den Chat aus der Detailansicht
     });
 
     // Hammer.js für Swipe-Gesten
