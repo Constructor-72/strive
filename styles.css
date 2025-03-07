@@ -412,13 +412,26 @@ html, body {
     position: fixed;
     top: 20px;
     left: 20px;
-    font-size: 24px;
     cursor: pointer;
     z-index: 1001;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 10px;
     border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Menü-Icon (SVG) */
+.menu-icon {
+    width: 24px; /* Größe des Icons anpassen */
+    height: 24px;
+    transition: opacity 0.3s ease;
+}
+
+.menu-button:hover .menu-icon {
+    opacity: 0.7; /* Leichte Transparenz beim Hover */
 }
 
 /* Menü-Dropdown */
