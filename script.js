@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutBtn = document.getElementById('logout-btn');
     const profileUsername = document.getElementById('profile-username');
     const closeProfileBtn = document.getElementById('close-profile-btn'); // Schließen-Button (X)
+    const skipDislikesToggle = document.getElementById('skip-dislikes-toggle'); // Toggle-Button für "Dislike"-Fahrzeuge
 
     // Variable zur Speicherung der aktuellen Chat-Auto-ID
     let currentChatCarId = null;
@@ -101,6 +102,12 @@ document.addEventListener('DOMContentLoaded', function() {
     closeProfileBtn.addEventListener('click', () => {
         profileWindow.style.display = 'none'; // Verstecke das Profilfenster
         cardElement.style.display = 'flex'; // Zeige den Swipen-Bereich an
+    });
+
+    // Toggle-Button für das Überspringen von "Dislike"-Fahrzeugen
+    skipDislikesToggle.checked = sessionStorage.getItem('skipDislikes') === 'true'; // Lade den gespeicherten Zustand
+    skipDislikesToggle.addEventListener('change', () => {
+        sessionStorage.setItem('skipDislikes', skipDislikesToggle.checked); // Speichere den Zustand
     });
 
     // Überprüfe den Anmeldestatus
@@ -366,6 +373,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     data.confidence = 0;
                 } else if (data.confidence !== undefined) {
                     console.log(`Konfidenz: ${data.confidence.toFixed(2)}%`);
+                }
+
+                // Überspringe "Dislike"-Fahrzeuge, wenn der Button aktiviert ist und ab dem 30. Fahrzeug
+                if (skipDislikesToggle.checked && carCounter >= 30 && data.prediction === 'Nein') {
+                    console.log(`Fahrzeug ${carId} wird übersprungen (Dislike-Vorhersage).`);
+                    currentCarId++; // Überspringe das aktuelle Fahrzeug
+                    loadCarData(currentCarId); // Lade das nächste Fahrzeug
+                    return;
                 }
 
                 // Immer Klassen hinzufügen, aber Farben erst nach 30 Autos aktivieren
