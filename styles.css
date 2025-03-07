@@ -262,6 +262,46 @@ html, body {
     background-color: #f0f0f0;
 }
 
+/* Toggle-Button-Container */
+.toggle-container {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Toggle-Button */
+#skip-dislikes-toggle {
+    width: 40px;
+    height: 20px;
+    appearance: none;
+    background-color: #ccc;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#skip-dislikes-toggle:checked {
+    background-color: #4CAF50; /* Grüne Farbe, wenn aktiviert */
+}
+
+#skip-dislikes-toggle::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s ease;
+}
+
+#skip-dislikes-toggle:checked::before {
+    transform: translateX(20px); /* Verschiebe den Kreis nach rechts */
+}
+
 /* Chatfenster */
 .chat-window {
     position: fixed;
