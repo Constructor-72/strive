@@ -346,14 +346,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Funktion zum Laden eines neuen Autos
     function loadCarData(carId) {
         loadingOverlay.style.display = 'flex'; // Ladeanzeige aktivieren
-
+    
         // Überprüfen, ob das Auto bereits im Cache ist
         const cachedCar = cachedCars.find(car => car.id === carId);
         if (cachedCar) {
             displayCarData(cachedCar);
             return;
         }
-
+    
         // Auto-Daten vom Server laden
         fetch(`/predict/${carId}`)
             .then(response => {
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 console.log(`Vorhersage für Auto ${carId}:`, data.prediction);
-
+    
                 // Überprüfen, ob eine Vorhersage möglich war
                 if (data.prediction === 'Keine eindeutige Vorhersage möglich.') {
                     console.warn('Keine Vorhersage möglich, da das Modell noch nicht genügend Daten hat.');
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (data.confidence !== undefined) {
                     console.log(`Konfidenz: ${data.confidence.toFixed(2)}%`);
                 }
-
+    
                 // Überspringe "Dislike"-Fahrzeuge, wenn der Button aktiviert ist und ab dem 30. Fahrzeug
                 if (skipDislikesToggle.checked && carCounter >= 30 && data.prediction === 'Nein') {
                     console.log(`Fahrzeug ${carId} wird übersprungen (Dislike-Vorhersage).`);
@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     loadCarData(currentCarId); // Lade das nächste Fahrzeug
                     return;
                 }
-
+    
                 // Immer Klassen hinzufügen, aber Farben erst nach 30 Autos aktivieren
                 cardElement.classList.remove('ja', 'nein');
                 if (data.prediction === 'Ja') {
@@ -390,15 +390,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (data.prediction === 'Nein') {
                     cardElement.classList.add('nein');
                 }
-
+    
                 // Zähler erhöhen
                 carCounter++;
-
+    
                 // Falls 30 Autos geladen wurden, Klasse für sichtbare Farben aktivieren
                 if (carCounter >= 30) {
                     cardElement.classList.add('visible-colors');
                 }
-
+    
                 return fetch(`/get_car?id=${carId}`);
             })
             .then(response => {

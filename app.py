@@ -177,15 +177,16 @@ def feedback():
     # Lade die Auto-Daten
     car = next((item for item in load_csv_data_once() if item['id'] == data['car_id']), None)
     if car:
-        # Überprüfen, dass alle 7 Features übergeben werden
+        # Überprüfen, dass alle 8 Features übergeben werden
         car_features = [
             car['mileage_ml'],           # Kilometerstand
+            car['price_ml'],             # Preis
             car['power_ml'],             # Leistung
             car['transmission_ml'],      # Getriebe (1 = Automatik, 0 = Manuell)
             car['fuel_ml'],              # Kraftstofftyp (Hashwert des Kraftstofftyps)
             car['tax'],                  # Kfz-Steuer
             car['mpg'],                  # Verbrauch
-            car['firstRegistration_ml']  # Erstzulassung (z. B. 2015)
+            car['firstRegistration_ml']  # Erstzulassung
         ]
         # Aktualisiere das Modell des Benutzers
         user_models[username].update(car_features, data['action'])
@@ -202,18 +203,24 @@ def predict(car_id):
 
     car = next((item for item in load_csv_data_once() if item['id'] == car_id), None)
     if car:
-        # Alle 7 Merkmale an das Modell übergeben
+        # Überprüfen, dass alle 8 Features übergeben werden
         car_features = [
             car['mileage_ml'],           # Kilometerstand
+            car['price_ml'],             # Preis
             car['power_ml'],             # Leistung
-            car['transmission_ml'],      # Getriebe
-            car['fuel_ml'],              # Kraftstofftyp
+            car['transmission_ml'],      # Getriebe (1 = Automatik, 0 = Manuell)
+            car['fuel_ml'],              # Kraftstofftyp (Hashwert des Kraftstofftyps)
             car['tax'],                  # Kfz-Steuer
             car['mpg'],                  # Verbrauch
             car['firstRegistration_ml']  # Erstzulassung
         ]
-        prediction, confidence = user_models[username].predict(car_features)
-        return jsonify({'prediction': prediction, 'confidence': confidence})
+        print(f"Car Features for ID {car_id}: {car_features}")  # Debugging: Gib die Features aus
+        try:
+            prediction, confidence = user_models[username].predict(car_features)
+            return jsonify({'prediction': prediction, 'confidence': confidence})
+        except Exception as e:
+            print(f"Fehler bei der Vorhersage für Auto {car_id}: {e}")
+            return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.', 'confidence': None})
     return jsonify({'prediction': 'Keine eindeutige Vorhersage möglich.', 'confidence': None})
 
 # API: Chat-Nachrichten speichern

@@ -77,7 +77,11 @@ class CarPredictionModel:
             filtered_set = []
             for i, (key, value) in enumerate(self.feature_config.items()):
                 if value:  # Nur aktivierte Features hinzufügen
-                    filtered_set.append(feature_set[i])
+                    if i < len(feature_set):  # Überprüfe, ob der Index gültig ist
+                        filtered_set.append(feature_set[i])
+                    else:
+                        print(f"Fehler: Feature {key} nicht in feature_set gefunden.")
+                        filtered_set.append(0)  # Standardwert, falls Feature fehlt
             filtered_features.append(filtered_set)
         return np.array(filtered_features)
 
