@@ -12,11 +12,11 @@ class CarPredictionModel:
             'mileage_ml': True,  # Kilometerstand
             'price_ml': True,    # Preis
             'power_ml': False,   # Leistung
-            'transmission_ml': False,  # Getriebe (Automatik/Manuell)
+            'transmission_ml': True,  # Getriebe (Automatik/Manuell)
             'fuel_ml': False,    # Kraftstofftyp
             'tax': False,        # Kfz-Steuer
             'mpg': False,        # Verbrauch (mpg)
-            'firstRegistration_ml': False  # Erstzulassung
+            'firstRegistration_ml': True  # Erstzulassung
         }
         self.model = self._build_model()
         self.X = []  # Features

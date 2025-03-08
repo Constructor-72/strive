@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Detailansicht anzeigen
     function showDetailView(car) {
         detailTitle.textContent = car.title;
-        detailImage.src = car.image || 'data/gap_filler.jpg';
+        detailImage.src = car.image;
 
         // Fülle die linke Spalte
         document.getElementById('detail-price').textContent = car.price;
@@ -486,6 +486,62 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('detail-fuel').textContent = car.fuel;
         document.getElementById('detail-tax').textContent = car.tax || 'Keine Angabe';
         document.getElementById('detail-mpg').textContent = car.mpg || 'Keine Angabe';
+
+        // Lade die Bilder für das Auto
+        fetch(`/get_car_images/${car.id}`)
+            .then(response => response.json())
+            .then(data => {
+                const images = data.images;
+                let currentImageIndex = 0;
+
+                // Funktion zum Wechseln des Bildes
+                function changeImage(direction) {
+                    currentImageIndex += direction;
+                    if (currentImageIndex >= images.length) {
+                        currentImageIndex = 0;
+                    } else if (currentImageIndex < 0) {
+                        currentImageIndex = images.length - 1;
+                    }
+                    detailImage.src = images[currentImageIndex];
+                }
+
+                // Event-Listener für die Pfeiltasten
+                document.getElementById('prev-image-btn').addEventListener('click', () => {
+                    changeImage(-1);
+                });
+
+                document.getElementById('next-image-btn').addEventListener('click', () => {
+                    changeImage(1);
+                });
+
+                // Event-Listener für die Pfeiltasten (Tastatur)
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight') {
+                        changeImage(1);
+                    } else if (e.key === 'ArrowLeft') {
+                        changeImage(-1);
+                    }
+                });
+
+                // Event-Listener für Touch-Gesten (Mobile)
+                let touchStartX = 0;
+                detailImage.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                });
+
+                detailImage.addEventListener('touchend', (e) => {
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const deltaX = touchEndX - touchStartX;
+                    if (deltaX > 50) {
+                        changeImage(-1); // Wische nach rechts -> vorheriges Bild
+                    } else if (deltaX < -50) {
+                        changeImage(1); // Wische nach links -> nächstes Bild
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Fehler beim Laden der Bilder:', error);
+            });
 
         detailView.style.display = 'flex';
     }

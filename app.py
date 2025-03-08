@@ -5,46 +5,35 @@ import pandas as pd
 import random
 from model import CarPredictionModel
 import locale
-import bcrypt  # Importiere bcrypt für das Hashen von Passwörtern
+import bcrypt
 
 app = Flask(__name__, static_folder='.')
-app.secret_key = 'your_secret_key'  # Wichtig für die Session-Verwaltung
+app.secret_key = 'your_secret_key'
 
 DATA_FOLDER = 'data'
-CHATS_FILE = 'chats.json'  # Datei zum Speichern der Chats
-USERS_FILE = 'users.json'  # Datei zum Speichern der Benutzer
+CHATS_FILE = 'chats.json'
+USERS_FILE = 'users.json'
 feedback_data = []
 
-# Einmalige Ladevariable für die CSV-Daten
 dataset = []
-
-# Globale Variable zur Speicherung der Modelle aller Benutzer
 user_models = {}
 
-# Setze die lokale Umgebung auf Deutsch, um die Tausendertrennung korrekt zu formatieren
 locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
 
-# Lade CSV-Daten und extrahiere die relevanten Informationen
 def load_csv_data_once():
     global dataset
     if dataset:  # Daten sind bereits geladen
         return dataset
 
-    all_data = []
-    for file in os.listdir(DATA_FOLDER):
-        if file.endswith('.csv'):
-            file_path = os.path.join(DATA_FOLDER, file)
-            df = pd.read_csv(file_path)
-            brand = os.path.splitext(file)[0].title()  # Marke mit Großbuchstaben beginnen
-            df['brand'] = brand  # Füge die Marke als neue Spalte hinzu
-            all_data.append(df)
+    file_path = os.path.join(DATA_FOLDER, 'cars.csv')  # Pfad zur CSV-Datei
 
-    # Kombiniere alle DataFrames zu einem großen DataFrame
-    combined_df = pd.concat(all_data, ignore_index=True)
+    # Lade die CSV-Datei mit Semikolon als Trennzeichen
+    df = pd.read_csv(file_path, delimiter=';')
 
-    dataset = []  # Leere die Liste vor dem Neufüllen
-    for index, row in combined_df.iterrows():
+    dataset = []
+    for index, row in df.iterrows():
         car_data = {
+            'id': int(row['ID']),
             'title': f"{row['brand']} {row['model']}",
             'price': locale.format_string("%d", row['price'], grouping=True),  # Tausendertrennung für Preis
             'price_ml': float(row['price']),
@@ -60,18 +49,25 @@ def load_csv_data_once():
             'fuel_ml': hash(row['fuelType']) % 1000,
             'tax': row.get('tax', 0),
             'mpg': row.get('mpg', 0),
-            'image': row.get('image', 'data/gap_filler.jpg'),
+            'image': f"data/jpg/{row['ID']}_1.jpg" if os.path.exists(f"data/jpg/{row['ID']}_1.jpg") else 'data/gap_filler.jpg',
+            'images': [f"data/jpg/{row['ID']}_{i}.jpg" for i in range(1, int(row['numberofpic']) + 1)] if os.path.exists(f"data/jpg/{row['ID']}_1.jpg") else ['data/gap_filler.jpg']
         }
         dataset.append(car_data)
 
     # Mische die Liste zufällig
-    random.shuffle(dataset)
-
-    # Weise die `id`s nach dem Mischen neu zu
-    for idx, car in enumerate(dataset, start=1):
-        car['id'] = idx
+    # random.shuffle(dataset)
 
     return dataset
+
+# API: Lade die Bilder für ein bestimmtes Auto
+@app.route('/get_car_images/<int:car_id>', methods=['GET'])
+def get_car_images(car_id):
+    dataset = load_csv_data_once()
+    car = next((item for item in dataset if item['id'] == car_id), None)
+    if car:
+        return jsonify({'images': car['images']})
+    else:
+        return jsonify({'status': 'failure', 'message': 'Car not found'}), 404
 
 # Lade Benutzerdaten
 def load_users():

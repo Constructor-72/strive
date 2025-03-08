@@ -78,7 +78,13 @@
     <div id="detail-view" class="detail-view" style="display: none;">
         <div class="detail-container">
             <h2 id="detail-title"></h2>
-            <img id="detail-image" src="" alt="Auto Bild">
+            <!-- Bild-Container mit Buttons -->
+            <div class="image-container">
+                <img id="detail-image" src="" alt="Auto Bild">
+                <!-- Buttons innerhalb des Bild-Containers -->
+                <img id="prev-image-btn" class="nav-btn" src="left.svg" alt="Vorheriges Bild">
+                <img id="next-image-btn" class="nav-btn" src="right.svg" alt="Nächstes Bild">
+            </div>
             <div id="detail-info" class="detail-info">
                 <div class="left">
                     <p><strong>Preis:</strong> <span id="detail-price"></span> €</p>

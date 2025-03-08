@@ -127,7 +127,45 @@ html, body {
     margin: 0;
 }
 
-/* Detailansicht */
+/* Stile für die Navigationsbuttons (SVG) */
+.nav-btn {
+    position: absolute; /* Absolute Positionierung relativ zum Bild-Container */
+    top: 48%; /* Vertikal zentrieren */
+    transform: translateY(-50%); /* Vertikal zentrieren */
+    background-color: rgba(0, 0, 0, 0); /* Halbtransparenter Hintergrund */
+    border: none; /* Kein Rahmen */
+    border-radius: 50%; /* Runde Buttons */
+    padding: 2%; /* Innenabstand */
+    cursor: pointer; /* Zeiger-Cursor */
+    z-index: 1001; /* Über dem Bild */
+    width: 4%; /* Breite der Buttons */
+    height: 89.5%; /* Höhe der Buttons */
+    display: flex; /* Flexbox für Zentrierung */
+    align-items: center; /* Vertikal zentrieren */
+    justify-content: center; /* Horizontal zentrieren */
+    transition: background-color 0.3s ease; /* Sanfte Farbänderung beim Hover */
+}
+
+#prev-image-btn {
+    left: 0%; /* Positionierung links */
+}
+
+#next-image-btn {
+    right: 0%; /* Positionierung rechts */
+}
+
+#prev-image-btn:hover,
+#next-image-btn:hover {
+    background-color: rgba(0, 0, 0, 0.3); /* Dunklerer Hintergrund beim Hover */
+}
+
+/* Bild-Container */
+.image-container {
+    position: relative; /* Relative Positionierung für die Buttons */
+    display: inline-block; /* Container passt sich der Bildgröße an */
+}
+
+/* Stile für die Detailansicht */
 .detail-view {
     position: fixed;
     top: 0;
@@ -177,26 +215,26 @@ html, body {
 
 /* Buttons in der Detailansicht */
 .detail-container .btn {
-    background-color: rgb(84, 113, 249); /* Neue Hintergrundfarbe */
+    background-color: rgb(84, 113, 249);
     color: white;
     border: none;
-    border-radius: 10px; /* Abgerundete Ecken */
-    padding: 15px 25px; /* Größere Buttons */
-    font-size: 1.2rem; /* Größere Schrift */
+    border-radius: 10px;
+    padding: 15px 25px;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
-    width: 100%; /* Volle Breite */
-    margin: 10px 0; /* Abstand zwischen den Buttons */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Schatten hinzufügen */
+    width: 100%;
+    margin: 10px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .detail-container .btn:hover {
-    background-color: rgb(70, 95, 210); /* Dunklere Farbe beim Hover */
-    transform: translateY(-2px); /* Leichter Effekt beim Hover */
+    background-color: rgb(70, 95, 210);
+    transform: translateY(-2px);
 }
 
 .detail-container .btn:active {
-    transform: translateY(0); /* Zurücksetzen beim Klicken */
+    transform: translateY(0);
 }
 
 /* Profilfenster */
@@ -530,6 +568,19 @@ html, body {
     .detail-container .btn {
         padding: 10px 20px; /* Kleinere Buttons */
         font-size: 1rem; /* Kleinere Schrift */
+    }
+
+    .nav-btn {
+        top: 47%; /* Vertikal zentrieren */
+        height: 87%; /* Höhe der Buttons */
+    }
+
+    #prev-image-btn {
+        left: 5%; /* Noch näher am Rand auf Handys */
+    }
+
+    #next-image-btn {
+        right: 5%; /* Noch näher am Rand auf Handys */
     }
 
     .chat-container {
