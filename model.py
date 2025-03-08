@@ -29,15 +29,15 @@ class CarPredictionModel:
         input_shape = (sum(self.feature_config.values()),)
         
         model = Sequential([
-            Dense(128, activation='relu', input_shape=input_shape),  # Eingabefeatures
+            Dense(64, activation='relu', input_shape=input_shape),  # Eingabefeatures
             BatchNormalization(),
-            Dropout(0.5),
-            Dense(128, activation='relu'),
-            BatchNormalization(),
-            Dropout(0.5),
+            Dropout(0.6),  # Erhöhte Dropout-Rate
             Dense(64, activation='relu'),
             BatchNormalization(),
-            Dropout(0.5),
+            Dropout(0.6),  # Erhöhte Dropout-Rate
+            Dense(32, activation='relu'),
+            BatchNormalization(),
+            Dropout(0.6),  # Erhöhte Dropout-Rate
             Dense(1, activation='sigmoid')  # Ausgabe zwischen 0 und 1
         ])
         model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
