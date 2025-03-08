@@ -12,11 +12,11 @@ class CarPredictionModel:
             'mileage_ml': True,  # Kilometerstand
             'price_ml': True,    # Preis
             'power_ml': False,   # Leistung
-            'transmission_ml': True,  # Getriebe (Automatik/Manuell)
+            'transmission_ml': False,  # Getriebe (Automatik/Manuell)
             'fuel_ml': False,    # Kraftstofftyp
             'tax': False,        # Kfz-Steuer
             'mpg': False,        # Verbrauch (mpg)
-            'firstRegistration_ml': True  # Erstzulassung
+            'firstRegistration_ml': False  # Erstzulassung
         }
         self.model = self._build_model()
         self.X = []  # Features
@@ -44,13 +44,18 @@ class CarPredictionModel:
         return model
 
     def train(self):
-        # Sicherstellen, dass genug Daten vorhanden sind
         if len(set(self.y)) > 1 and len(self.X) >= self.min_samples:
-            # Nur die aktivierten Features verwenden
             X_filtered = self._filter_features(self.X)
             X_scaled = self.scaler.fit_transform(X_filtered)
-            early_stopping = EarlyStopping(monitor='loss', patience=10, restore_best_weights=True)
-            self.model.fit(X_scaled, np.array(self.y), epochs=200, batch_size=32, verbose=0, callbacks=[early_stopping])
+            y_array = np.array(self.y)
+            
+            # Aufteilung in Trainings- und Validierungsdaten
+            split_index = int(0.8 * len(X_scaled))  # 80% Training, 20% Validierung
+            X_train, X_val = X_scaled[:split_index], X_scaled[split_index:]
+            y_train, y_val = y_array[:split_index], y_array[split_index:]
+            
+            early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+            self.model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=200, batch_size=32, verbose=0, callbacks=[early_stopping])
 
     def predict(self, car_features):
         # Prüfen, ob das Modell ausreichend trainiert wurde
@@ -65,10 +70,17 @@ class CarPredictionModel:
         return ('Ja' if prediction >= 0.5 else 'Nein'), confidence * 100
 
     def update(self, car_features, feedback):
-        # Trainingsdaten aktualisieren
         self.X.append(car_features)
         self.y.append(1 if feedback == 'like' else 0)
-        self.train()
+        
+        # Überprüfen Sie das Gleichgewicht zwischen Likes und Dislikes
+        likes = sum(self.y)
+        dislikes = len(self.y) - likes
+        print(f"Likes: {likes}, Dislikes: {dislikes}")  # Debugging
+        
+        # Trainieren Sie das Modell nur, wenn genügend Daten vorhanden sind
+        if len(self.y) >= self.min_samples:
+            self.train()
 
     def _filter_features(self, features):
         # Filtert die Features basierend auf der Konfiguration

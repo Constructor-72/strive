@@ -1,35 +1,6 @@
 {
-    "test": {
-        "password": "$2b$12$w468BqmVNQamESi/uDAVzuDqYLFzWvMdgedvDlbdVivhjycol3zXy",
-        "likes": [
-            1,
-            2,
-            4,
-            9,
-            10,
-            1,
-            2,
-            4,
-            6,
-            7,
-            1,
-            2
-        ],
-        "dislikes": [
-            3,
-            5,
-            6,
-            7,
-            8,
-            3,
-            5,
-            8,
-            9
-        ],
-        "chats": []
-    },
-    "test2": {
-        "password": "$2b$12$ovhETQX9PzXZYFJZfi2i5uUrPr.IKsArYZbmZJZin9zqi6.XmAaMW",
+    "user": {
+        "password": "$2b$12$u4aXeVUnUCU25TSCmXyq9.HU9aOtKbs9qiUHnjwRUT9lSVjR6/57.",
         "likes": [
             1,
             2,
@@ -37,8 +8,8 @@
             5,
             6,
             7,
+            8,
             9,
-            11,
             12,
             15,
             17,
@@ -50,20 +21,64 @@
             27,
             28,
             29,
-            30
+            30,
+            32,
+            33,
+            34,
+            36,
+            37,
+            38,
+            39,
+            41,
+            42,
+            44,
+            45,
+            46,
+            47,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55
         ],
         "dislikes": [
             3,
-            8,
             10,
+            11,
             13,
             14,
             16,
             18,
             20,
             23,
-            24
+            24,
+            31,
+            35,
+            40,
+            43
         ],
-        "chats": []
+        "chats": [
+            {
+                "car_id": 41,
+                "message": "Hallo Welt",
+                "timestamp": "8.3.2025, 17:26:17"
+            },
+            {
+                "car_id": 42,
+                "message": "uaoifh",
+                "timestamp": "8.3.2025, 17:26:35"
+            },
+            {
+                "car_id": 42,
+                "message": "zza",
+                "timestamp": "8.3.2025, 17:26:40"
+            },
+            {
+                "car_id": 41,
+                "message": "zad",
+                "timestamp": "8.3.2025, 17:26:55"
+            }
+        ]
     }
 }
