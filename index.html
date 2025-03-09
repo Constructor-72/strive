@@ -21,9 +21,39 @@
             <li id="menu-swipe">Swipen</li>
             <li id="menu-chats">Chats</li>
             <li id="menu-profile">Mein Profil</li>
+            <li id="menu-add-car">Auto hinzufügen</li> <!-- Neuer Menüpunkt -->
         </ul>
     </div>
 
+    <!-- Formular zum Hinzufügen eines neuen Autos -->
+    <div id="add-car-window" class="add-car-window" style="display: none;">
+        <div class="add-car-container">
+            <h2>Neues Auto hinzufügen</h2>
+            <form id="add-car-form">
+                <input type="text" id="brand" placeholder="Marke" required>
+                <input type="text" id="model" placeholder="Modell" required>
+                <input type="number" id="price" placeholder="Preis (€)" required>
+                <input type="number" id="mileage" placeholder="Kilometerstand" required>
+                <input type="number" id="engineSize" placeholder="Hubraum (L)" step="0.1" required>
+                <input type="number" id="year" placeholder="Erstzulassung (Jahr)" required>
+                <select id="transmission" required>
+                    <option value="Automatic">Automatik</option>
+                    <option value="Manual">Manuell</option>
+                </select>
+                <select id="fuelType" required>
+                    <option value="Petrol">Benzin</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Elektrisch</option>
+                    <option value="Hybrid">Hybrid</option>
+                </select>
+                <input type="number" id="tax" placeholder="Kfz-Steuer (€)" required>
+                <input type="number" id="mpg" placeholder="Verbrauch (mpg)" step="0.1" required>
+                <input type="file" id="car-images" accept="image/*" multiple required>
+                <button type="submit" class="btn">Auto hinzufügen</button>
+            </form>
+            <button id="close-add-car-btn" class="btn">Schließen</button>
+        </div>
+    </div>
     <!-- Profilfenster (standardmäßig ausgeblendet) -->
     <div id="profile-window" class="profile-window" style="display: none;">
         <div class="profile-container">

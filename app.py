@@ -4,8 +4,10 @@ import json
 import pandas as pd
 import random
 from model import CarPredictionModel
+from werkzeug.utils import secure_filename
 import locale
 import bcrypt
+import uuid
 
 app = Flask(__name__, static_folder='.')
 app.secret_key = 'your_secret_key'
@@ -19,6 +21,10 @@ dataset = []
 user_models = {}
 
 locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
+
+# Stelle sicher, dass der Bilder-Ordner existiert
+if not os.path.exists(os.path.join(DATA_FOLDER, 'jpg')):
+    os.makedirs(os.path.join(DATA_FOLDER, 'jpg'))
 
 def load_csv_data_once():
     global dataset
@@ -53,9 +59,6 @@ def load_csv_data_once():
             'images': [f"data/jpg/{row['ID']}_{i}.jpg" for i in range(1, int(row['numberofpic']) + 1)] if os.path.exists(f"data/jpg/{row['ID']}_1.jpg") else ['data/gap_filler.jpg']
         }
         dataset.append(car_data)
-
-    # Mische die Liste zufällig
-    # random.shuffle(dataset)
 
     return dataset
 
@@ -260,6 +263,85 @@ def get_chat_messages(car_id):
     username = session['username']
     car_chats = [chat for chat in users[username]['chats'] if chat['car_id'] == car_id]
     return jsonify(car_chats)
+
+# API: Neues Auto hinzufügen
+@app.route('/add_car', methods=['POST'])
+def add_car():
+    if 'username' not in session:
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
+
+    # Formulardaten verarbeiten
+    brand = request.form.get('brand')
+    model = request.form.get('model')
+    price = float(request.form.get('price'))
+    mileage = int(request.form.get('mileage'))
+    engineSize = float(request.form.get('engineSize'))
+    year = int(request.form.get('year'))
+    transmission = request.form.get('transmission')
+    fuelType = request.form.get('fuelType')
+    tax = float(request.form.get('tax'))
+    mpg = float(request.form.get('mpg'))
+    images = request.files.getlist('images')
+
+    if len(images) > 3:
+        return jsonify({'status': 'failure', 'message': 'Maximal 3 Bilder erlaubt'}), 400
+
+    # Generiere eine eindeutige ID für das neue Auto
+    new_car_id = str(uuid.uuid4().int)[:8]  # Kürze die ID auf 8 Stellen
+
+    # Speichere die Bilder
+    for i, image in enumerate(images):
+        if image.filename == '':
+            continue
+        filename = secure_filename(f"{new_car_id}_{i + 1}.jpg")
+        image.save(os.path.join(DATA_FOLDER, 'jpg', filename))
+
+    # Erstelle einen neuen Datensatz für das Auto
+    new_car = {
+        'ID': new_car_id,
+        'brand': brand,
+        'model': model,
+        'price': price,
+        'mileage': mileage,
+        'engineSize': engineSize,
+        'year': year,
+        'transmission': transmission,
+        'fuelType': fuelType,
+        'tax': tax,
+        'mpg': mpg,
+        'numberofpic': len(images)  # Anzahl der Bilder
+    }
+
+    # Füge den neuen Datensatz zur CSV-Datei hinzu
+    file_path = os.path.join(DATA_FOLDER, 'cars.csv')
+    df = pd.read_csv(file_path, delimiter=';')
+
+    # Verwende pd.concat statt append
+    new_df = pd.DataFrame([new_car])
+    df = pd.concat([df, new_df], ignore_index=True)
+
+    df.to_csv(file_path, sep=';', index=False)
+
+    return jsonify({'status': 'success', 'message': 'Auto erfolgreich hinzugefügt', 'car_id': new_car_id})
+
+# API: Bilder für ein neues Auto speichern
+@app.route('/upload_images/<car_id>', methods=['POST'])
+def upload_images(car_id):
+    if 'username' not in session:
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
+
+    if 'images' not in request.files:
+        return jsonify({'status': 'failure', 'message': 'Keine Bilder hochgeladen'}), 400
+
+    images = request.files.getlist('images')
+    for i, image in enumerate(images):
+        if image.filename == '':
+            continue
+        filename = secure_filename(f"{car_id}_{i + 1}.jpg")
+        image.save(os.path.join(DATA_FOLDER, 'jpg', filename))
+
+    return jsonify({'status': 'success', 'message': 'Bilder erfolgreich hochgeladen'})
+
 
 # Hauptseite
 @app.route('/')

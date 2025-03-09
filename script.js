@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuSwipe = document.getElementById('menu-swipe');
     const menuChats = document.getElementById('menu-chats');
     const menuProfile = document.getElementById('menu-profile');
+    const menuAddCar = document.getElementById('menu-add-car'); // Neuer Menüpunkt
 
     // Chat-Übersicht-Elemente
     const chatOverview = document.getElementById('chat-overview');
@@ -52,6 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeProfileBtn = document.getElementById('close-profile-btn'); // Schließen-Button (X)
     const skipDislikesToggle = document.getElementById('skip-dislikes-toggle'); // Toggle-Button für "Dislike"-Fahrzeuge
 
+    // Neue Elemente für das Hinzufügen eines Autos
+    const addCarWindow = document.getElementById('add-car-window'); // Fenster zum Hinzufügen eines Autos
+    const addCarForm = document.getElementById('add-car-form'); // Formular zum Hinzufügen eines Autos
+    const closeAddCarBtn = document.getElementById('close-add-car-btn'); // Schließen-Button für das Formular
+
     // Variable zur Speicherung der aktuellen Chat-Auto-ID
     let currentChatCarId = null;
 
@@ -66,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chatOverview.style.display = 'none';
         chatWindow.style.display = 'none';
         profileWindow.style.display = 'none';
+        addCarWindow.style.display = 'none'; // Verstecke das Formular
         cardElement.style.display = 'flex';
         detailView.style.display = 'none';
     });
@@ -77,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
         detailView.style.display = 'none';
         chatWindow.style.display = 'none';
         profileWindow.style.display = 'none';
+        addCarWindow.style.display = 'none'; // Verstecke das Formular
         chatOverview.style.display = 'flex';
         loadChatOverview();
     });
@@ -88,26 +96,83 @@ document.addEventListener('DOMContentLoaded', function() {
         detailView.style.display = 'none';
         chatWindow.style.display = 'none';
         chatOverview.style.display = 'none';
+        addCarWindow.style.display = 'none'; // Verstecke das Formular
         profileWindow.style.display = 'flex';
         checkLoginStatus();
     });
 
-    // Zurück zum Swipen
-    backToSwipe.addEventListener('click', () => {
+    // Neuer Menüpunkt "Auto hinzufügen" klicken
+    menuAddCar.addEventListener('click', () => {
+        menuDropdown.style.display = 'none';
+        cardElement.style.display = 'none';
+        detailView.style.display = 'none';
+        chatWindow.style.display = 'none';
         chatOverview.style.display = 'none';
-        cardElement.style.display = 'flex';
+        profileWindow.style.display = 'none';
+        addCarWindow.style.display = 'flex'; // Zeige das Formular an
     });
 
-    // Schließen-Button (X) im Profilfenster
-    closeProfileBtn.addEventListener('click', () => {
-        profileWindow.style.display = 'none'; // Verstecke das Profilfenster
-        cardElement.style.display = 'flex'; // Zeige den Swipen-Bereich an
+    // Schließen-Button für das Formular zum Hinzufügen eines Autos
+    closeAddCarBtn.addEventListener('click', () => {
+        addCarWindow.style.display = 'none';
+        cardElement.style.display = 'flex'; // Zurück zur Swipen-Ansicht
     });
 
-    // Toggle-Button für das Überspringen von "Dislike"-Fahrzeugen
-    skipDislikesToggle.checked = sessionStorage.getItem('skipDislikes') === 'true'; // Lade den gespeicherten Zustand
-    skipDislikesToggle.addEventListener('change', () => {
-        sessionStorage.setItem('skipDislikes', skipDislikesToggle.checked); // Speichere den Zustand
+    // Formular zum Hinzufügen eines Autos absenden
+    addCarForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const brand = document.getElementById('brand').value;
+        const model = document.getElementById('model').value;
+        const price = parseFloat(document.getElementById('price').value);
+        const mileage = parseInt(document.getElementById('mileage').value);
+        const engineSize = parseFloat(document.getElementById('engineSize').value);
+        const year = parseInt(document.getElementById('year').value);
+        const transmission = document.getElementById('transmission').value;
+        const fuelType = document.getElementById('fuelType').value;
+        const tax = parseFloat(document.getElementById('tax').value);
+        const mpg = parseFloat(document.getElementById('mpg').value);
+        const images = document.getElementById('car-images').files;
+
+        if (images.length > 3) {
+            alert('Sie können maximal 3 Bilder hochladen.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('brand', brand);
+        formData.append('model', model);
+        formData.append('price', price);
+        formData.append('mileage', mileage);
+        formData.append('engineSize', engineSize);
+        formData.append('year', year);
+        formData.append('transmission', transmission);
+        formData.append('fuelType', fuelType);
+        formData.append('tax', tax);
+        formData.append('mpg', mpg);
+
+        for (let i = 0; i < images.length; i++) {
+            formData.append('images', images[i]);
+        }
+
+        fetch('/add_car', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Auto erfolgreich hinzugefügt!');
+                    addCarWindow.style.display = 'none';
+                    cardElement.style.display = 'flex'; // Zurück zur Swipen-Ansicht
+                } else {
+                    alert('Fehler beim Hinzufügen des Autos.');
+                }
+            })
+            .catch(error => {
+                console.error('Fehler:', error);
+                alert('Fehler beim Hinzufügen des Autos.');
+            });
     });
 
     // Überprüfe den Anmeldestatus
