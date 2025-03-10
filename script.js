@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         fetch(`/get_car?id=${carId}`)
                             .then(response => {
                                 if (!response.ok) {
-                                    throw new Error('Fehler beim Laden der Auto-Daten');
+                                    throw new Error('Auto nicht gefunden');
                                 }
                                 return response.json();
                             })
@@ -157,7 +157,28 @@ document.addEventListener('DOMContentLoaded', function() {
                                 addedCarsContainer.appendChild(carElement);
                             })
                             .catch(error => {
-                                console.error('Fehler beim Laden der Auto-Daten:', error);
+                                console.error(`Fehler beim Laden der Auto-Daten für ID ${carId}:`, error);
+                                // Entferne die ungültige ID aus der Liste der hinzugefügten Autos
+                                const updatedAddedCars = userData.added_cars.filter(id => id !== carId);
+                                userData.added_cars = updatedAddedCars;
+
+                                // Aktualisiere die Benutzerdaten auf dem Server
+                                fetch('/update_added_cars', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ added_cars: updatedAddedCars })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.status === 'success') {
+                                            console.log('Benutzerdaten erfolgreich aktualisiert.');
+                                        } else {
+                                            console.error('Fehler beim Aktualisieren der Benutzerdaten:', data.message);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Fehler beim Aktualisieren der Benutzerdaten:', error);
+                                    });
                             });
                     });
                 } else {
@@ -258,6 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('Auto erfolgreich hinzugefügt!');
                     addCarWindow.style.display = 'none';
                     cardElement.style.display = 'flex';
+                    loadAddedCars(); // Lade die hinzugefügten Autos neu
                 } else {
                     alert('Fehler beim Hinzufügen des Autos.');
                 }
@@ -694,7 +716,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event-Listener für den Lösch-Button
     addedCarDeleteBtn.addEventListener('click', () => {
         if (confirm('Möchten Sie dieses Auto wirklich löschen?')) {
-            const carId = currentCarId;
+            const carId = addedCarDetailView.dataset.carId; // Verwende die ID des aktuell angezeigten Autos
             console.log('Versuche Auto zu löschen mit ID:', carId);
 
             fetch(`/delete_car/${carId}`, {
@@ -743,6 +765,9 @@ document.addEventListener('DOMContentLoaded', function() {
         addedCarDetailFuel.textContent = car.fuel;
         addedCarDetailTax.textContent = car.tax || 'Keine Angabe';
         addedCarDetailMpg.textContent = car.mpg || 'Keine Angabe';
+
+        // Setze die ID des Autos als Datenattribut
+        addedCarDetailView.dataset.carId = car.id;
 
         fetch(`/get_car_images/${car.id}`)
             .then(response => response.json())

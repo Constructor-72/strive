@@ -343,6 +343,11 @@ def add_car():
     users[username]['added_cars'].append(new_car_id)
     save_users(users)
 
+    # Aktualisiere die dataset-Variable
+    global dataset
+    dataset = []  # Setze dataset zurück, damit es neu geladen wird
+    load_csv_data_once()  # Lade die Daten neu
+
     return jsonify({'status': 'success', 'message': 'Auto erfolgreich hinzugefügt', 'car_id': new_car_id})
 
 # API: Bilder für ein neues Auto speichern
@@ -362,6 +367,27 @@ def upload_images(car_id):
         image.save(os.path.join(DATA_FOLDER, 'jpg', filename))
 
     return jsonify({'status': 'success', 'message': 'Bilder erfolgreich hochgeladen'})
+
+# API: Aktualisiere die Liste der hinzugefügten Autos eines Benutzers
+@app.route('/update_added_cars', methods=['POST'])
+def update_added_cars():
+    if 'username' not in session:
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
+
+    data = request.get_json()
+    if 'added_cars' not in data:
+        return jsonify({'status': 'failure', 'message': 'Fehlende Daten'}), 400
+
+    users = load_users()
+    username = session['username']
+    if username not in users:
+        return jsonify({'status': 'failure', 'message': 'Benutzer nicht gefunden'}), 404
+
+    # Aktualisiere die Liste der hinzugefügten Autos
+    users[username]['added_cars'] = data['added_cars']
+    save_users(users)
+
+    return jsonify({'status': 'success'})
 
 # API: Auto löschen
 @app.route('/delete_car/<car_id>', methods=['DELETE'])
