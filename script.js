@@ -118,6 +118,18 @@ document.addEventListener('DOMContentLoaded', function() {
         cardElement.style.display = 'flex'; // Zurück zur Swipen-Ansicht
     });
 
+    // Schließen-Button (X) im Profilfenster
+    closeProfileBtn.addEventListener('click', () => {
+        profileWindow.style.display = 'none'; // Verstecke das Profilfenster
+        cardElement.style.display = 'flex'; // Zeige den Swipen-Bereich an
+    });
+
+    // Zurück zum Swipen (Chat-Übersicht)
+    backToSwipe.addEventListener('click', () => {
+        chatOverview.style.display = 'none'; // Verstecke die Chat-Übersicht
+        cardElement.style.display = 'flex'; // Zeige den Swipen-Bereich an
+    });
+
     // Formular zum Hinzufügen eines Autos absenden
     addCarForm.addEventListener('submit', (e) => {
         e.preventDefault();
