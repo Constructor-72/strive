@@ -21,7 +21,7 @@
             <li id="menu-swipe">Swipen</li>
             <li id="menu-chats">Chats</li>
             <li id="menu-profile">Mein Profil</li>
-            <li id="menu-add-car">Auto hinzufügen</li> <!-- Neuer Menüpunkt -->
+            <li id="menu-add-car">Auto hinzufügen</li>
         </ul>
     </div>
 
@@ -54,10 +54,10 @@
             <button id="close-add-car-btn" class="btn">Schließen</button>
         </div>
     </div>
-    <!-- Profilfenster (standardmäßig ausgeblendet) -->
+
+    <!-- Profilfenster -->
     <div id="profile-window" class="profile-window" style="display: none;">
         <div class="profile-container">
-            <!-- Schließen-Button (X) -->
             <img src="close.svg" alt="Schließen" id="close-profile-btn" class="close-profile-btn">
             <h2>Mein Profil</h2>
             <div id="login-form">
@@ -68,7 +68,6 @@
             </div>
             <div id="profile-info" style="display: none;">
                 <p>Angemeldet als: <span id="profile-username"></span></p>
-                <!-- Toggle-Button für das Überspringen von "Dislike"-Fahrzeugen -->
                 <div class="toggle-container">
                     <label for="skip-dislikes-toggle">Fahrzeuge, die als Falsch prognostiziert werden skippen</label>
                     <input type="checkbox" id="skip-dislikes-toggle">
@@ -76,42 +75,32 @@
                 <br/>
                 <button id="logout-btn" class="btn">Abmelden</button>
             </div>
+            <div id="added-cars-container" class="added-cars-container"></div>
         </div>
     </div>
 
+    <!-- Hauptcontainer -->
     <div class="container">
         <div class="card">
-            <!-- Lade-Overlay, das standardmäßig verborgen ist -->
-            <div class="loading-overlay" id="loading-overlay">
-                Lade Daten...
-            </div>
-            
-            <!-- Anzeige des Autos -->
+            <div class="loading-overlay" id="loading-overlay">Lade Daten...</div>
             <div class="car-image" id="car-image">
                 <img src="" alt="Auto Bild" id="car-img">
             </div>
-
-            <!-- Swipe-Indikator -->
             <div class="swipe-indicator" id="swipe-indicator"></div>
-
             <div class="car-info" id="car-info">
                 <h2 id="car-title">Auto Details</h2>
                 <div id="car-details"></div>
             </div>
-            
-            <!-- Vorhersage-Anzeige -->
             <div id="prediction" style="font-weight: bold;"></div>
         </div>
     </div>
 
-    <!-- Detailansicht (standardmäßig ausgeblendet) -->
+    <!-- Detailansicht -->
     <div id="detail-view" class="detail-view" style="display: none;">
         <div class="detail-container">
             <h2 id="detail-title"></h2>
-            <!-- Bild-Container mit Buttons -->
             <div class="image-container">
                 <img id="detail-image" src="" alt="Auto Bild">
-                <!-- Buttons innerhalb des Bild-Containers -->
                 <img id="prev-image-btn" class="nav-btn" src="left.svg" alt="Vorheriges Bild">
                 <img id="next-image-btn" class="nav-btn" src="right.svg" alt="Nächstes Bild">
             </div>
@@ -129,12 +118,50 @@
                     <p><strong>Verbrauch:</strong> <span id="detail-mpg"></span> mpg</p>
                 </div>
             </div>
-            <button id="chat-btn" class="btn">Chat starten</button>
+            <button id="chat-btn" class="btn">Chat mit Verkäufer</button>
             <button id="back-btn" class="btn">Zurück</button>
         </div>
     </div>
 
-    <!-- Chatfenster (standardmäßig ausgeblendet) -->
+    <!-- Detailansicht für hinzugefügte Autos -->
+    <div id="added-car-detail-view" class="added-car-detail-view" style="display: none;">
+        <div class="added-car-detail-container">
+            <h2 id="added-car-detail-title"></h2>
+            <div class="image-container">
+                <img id="added-car-detail-image" src="" alt="Auto Bild">
+                <img id="added-car-prev-image-btn" class="nav-btn" src="left.svg" alt="Vorheriges Bild">
+                <img id="added-car-next-image-btn" class="nav-btn" src="right.svg" alt="Nächstes Bild">
+            </div>
+            <div id="added-car-detail-info" class="added-car-detail-info">
+                <div class="left">
+                    <p><strong>Preis:</strong> <span id="added-car-detail-price"></span> €</p>
+                    <p><strong>Kilometerstand:</strong> <span id="added-car-detail-mileage"></span> km</p>
+                    <p><strong>Hubraum:</strong> <span id="added-car-detail-power"></span> L</p>
+                    <p><strong>Erstzulassung:</strong> <span id="added-car-detail-registration"></span></p>
+                </div>
+                <div class="right">
+                    <p><strong>Getriebe:</strong> <span id="added-car-detail-transmission"></span></p>
+                    <p><strong>Kraftstofftyp:</strong> <span id="added-car-detail-fuel"></span></p>
+                    <p><strong>Kfz-Steuer:</strong> <span id="added-car-detail-tax"></span> €</p>
+                    <p><strong>Verbrauch:</strong> <span id="added-car-detail-mpg"></span> mpg</p>
+                </div>
+            </div>
+            <button id="added-car-chat-btn" class="btn">Chats</button>
+            <button id="added-car-back-btn" class="btn">Zurück</button>
+            <button id="added-car-delete-btn" class="btn delete-btn">Löschen</button>
+        </div>
+    </div>
+
+    <!-- Fenster für Chats mit Käufern -->
+    <div id="buyer-chats-window" class="buyer-chats-window" style="display: none;">
+        <div class="buyer-chats-container">
+            <h2>Chats mit Käufern</h2>
+            <div id="buyer-chats-messages"></div>
+            <button id="close-buyer-chats-btn" class="btn">Schließen</button>
+        </div>
+    </div>
+
+    <!-- Chatfenster -->
     <div id="chat-window" class="chat-window" style="display: none;">
         <div class="chat-container">
             <h2>Chat mit Verkäufer</h2>
@@ -145,7 +172,7 @@
         </div>
     </div>
 
-    <!-- Chat-Übersicht (standardmäßig ausgeblendet) -->
+    <!-- Chat-Übersicht -->
     <div id="chat-overview" class="chat-overview" style="display: none;">
         <div class="chat-overview-container">
             <h2>Chats</h2>

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuSwipe = document.getElementById('menu-swipe');
     const menuChats = document.getElementById('menu-chats');
     const menuProfile = document.getElementById('menu-profile');
-    const menuAddCar = document.getElementById('menu-add-car'); // Neuer Menüpunkt
+    const menuAddCar = document.getElementById('menu-add-car');
 
     // Chat-Übersicht-Elemente
     const chatOverview = document.getElementById('chat-overview');
@@ -50,13 +50,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerBtn = document.getElementById('register-btn');
     const logoutBtn = document.getElementById('logout-btn');
     const profileUsername = document.getElementById('profile-username');
-    const closeProfileBtn = document.getElementById('close-profile-btn'); // Schließen-Button (X)
-    const skipDislikesToggle = document.getElementById('skip-dislikes-toggle'); // Toggle-Button für "Dislike"-Fahrzeuge
+    const closeProfileBtn = document.getElementById('close-profile-btn');
+    const skipDislikesToggle = document.getElementById('skip-dislikes-toggle');
 
     // Neue Elemente für das Hinzufügen eines Autos
-    const addCarWindow = document.getElementById('add-car-window'); // Fenster zum Hinzufügen eines Autos
-    const addCarForm = document.getElementById('add-car-form'); // Formular zum Hinzufügen eines Autos
-    const closeAddCarBtn = document.getElementById('close-add-car-btn'); // Schließen-Button für das Formular
+    const addCarWindow = document.getElementById('add-car-window');
+    const addCarForm = document.getElementById('add-car-form');
+    const closeAddCarBtn = document.getElementById('close-add-car-btn');
+
+    // Neue Detailansicht für hinzugefügte Autos
+    const addedCarDetailView = document.getElementById('added-car-detail-view');
+    const addedCarDetailTitle = document.getElementById('added-car-detail-title');
+    const addedCarDetailImage = document.getElementById('added-car-detail-image');
+    const addedCarDetailPrice = document.getElementById('added-car-detail-price');
+    const addedCarDetailMileage = document.getElementById('added-car-detail-mileage');
+    const addedCarDetailPower = document.getElementById('added-car-detail-power');
+    const addedCarDetailRegistration = document.getElementById('added-car-detail-registration');
+    const addedCarDetailTransmission = document.getElementById('added-car-detail-transmission');
+    const addedCarDetailFuel = document.getElementById('added-car-detail-fuel');
+    const addedCarDetailTax = document.getElementById('added-car-detail-tax');
+    const addedCarDetailMpg = document.getElementById('added-car-detail-mpg');
+    const addedCarBackBtn = document.getElementById('added-car-back-btn');
+    const addedCarChatBtn = document.getElementById('added-car-chat-btn');
+    const addedCarDeleteBtn = document.getElementById('added-car-delete-btn');
+
+    // Fenster für Chats mit Käufern
+    const buyerChatsWindow = document.getElementById('buyer-chats-window');
+    const buyerChatsMessages = document.getElementById('buyer-chats-messages');
+    const closeBuyerChatsBtn = document.getElementById('close-buyer-chats-btn');
 
     // Variable zur Speicherung der aktuellen Chat-Auto-ID
     let currentChatCarId = null;
@@ -72,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
         chatOverview.style.display = 'none';
         chatWindow.style.display = 'none';
         profileWindow.style.display = 'none';
-        addCarWindow.style.display = 'none'; // Verstecke das Formular
+        addCarWindow.style.display = 'none';
         cardElement.style.display = 'flex';
         detailView.style.display = 'none';
     });
@@ -84,10 +105,69 @@ document.addEventListener('DOMContentLoaded', function() {
         detailView.style.display = 'none';
         chatWindow.style.display = 'none';
         profileWindow.style.display = 'none';
-        addCarWindow.style.display = 'none'; // Verstecke das Formular
+        addCarWindow.style.display = 'none';
         chatOverview.style.display = 'flex';
         loadChatOverview();
     });
+
+    // Funktion zum Laden der hinzugefügten Autos
+    function loadAddedCars() {
+        fetch('/get_user')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Fehler beim Laden der Benutzerdaten');
+                }
+                return response.json();
+            })
+            .then(userData => {
+                const addedCarsContainer = document.getElementById('added-cars-container');
+                addedCarsContainer.innerHTML = ''; // Leere den Container
+
+                if (userData.added_cars && userData.added_cars.length > 0) {
+                    userData.added_cars.forEach(carId => {
+                        fetch(`/get_car?id=${carId}`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Fehler beim Laden der Auto-Daten');
+                                }
+                                return response.json();
+                            })
+                            .then(carData => {
+                                // Füge die Auto-Daten in den Cache
+                                cachedCars.push(carData);
+
+                                const carElement = document.createElement('div');
+                                carElement.className = 'added-car';
+                                carElement.dataset.carId = carId; // Füge die Auto-ID als Datenattribut hinzu
+
+                                // Bild des Autos
+                                const carImage = document.createElement('img');
+                                carImage.src = carData.image || 'data/gap_filler.jpg';
+                                carImage.className = 'added-car-image';
+
+                                // Titel des Autos
+                                const carTitle = document.createElement('span');
+                                carTitle.textContent = carData.title;
+
+                                // Füge Bild und Titel zum Auto-Element hinzu
+                                carElement.appendChild(carImage);
+                                carElement.appendChild(carTitle);
+
+                                // Füge das Auto-Element zum Container hinzu
+                                addedCarsContainer.appendChild(carElement);
+                            })
+                            .catch(error => {
+                                console.error('Fehler beim Laden der Auto-Daten:', error);
+                            });
+                    });
+                } else {
+                    addedCarsContainer.innerHTML = '<p>Keine hinzugefügten Autos.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Fehler beim Laden der Benutzerdaten:', error);
+            });
+    }
 
     // Menüpunkt "Mein Profil" klicken
     menuProfile.addEventListener('click', () => {
@@ -96,9 +176,10 @@ document.addEventListener('DOMContentLoaded', function() {
         detailView.style.display = 'none';
         chatWindow.style.display = 'none';
         chatOverview.style.display = 'none';
-        addCarWindow.style.display = 'none'; // Verstecke das Formular
+        addCarWindow.style.display = 'none';
         profileWindow.style.display = 'flex';
         checkLoginStatus();
+        loadAddedCars(); // Lade die hinzugefügten Autos
     });
 
     // Neuer Menüpunkt "Auto hinzufügen" klicken
@@ -109,25 +190,25 @@ document.addEventListener('DOMContentLoaded', function() {
         chatWindow.style.display = 'none';
         chatOverview.style.display = 'none';
         profileWindow.style.display = 'none';
-        addCarWindow.style.display = 'flex'; // Zeige das Formular an
+        addCarWindow.style.display = 'flex';
     });
 
     // Schließen-Button für das Formular zum Hinzufügen eines Autos
     closeAddCarBtn.addEventListener('click', () => {
         addCarWindow.style.display = 'none';
-        cardElement.style.display = 'flex'; // Zurück zur Swipen-Ansicht
+        cardElement.style.display = 'flex';
     });
 
     // Schließen-Button (X) im Profilfenster
     closeProfileBtn.addEventListener('click', () => {
-        profileWindow.style.display = 'none'; // Verstecke das Profilfenster
-        cardElement.style.display = 'flex'; // Zeige den Swipen-Bereich an
+        profileWindow.style.display = 'none';
+        cardElement.style.display = 'flex';
     });
 
     // Zurück zum Swipen (Chat-Übersicht)
     backToSwipe.addEventListener('click', () => {
-        chatOverview.style.display = 'none'; // Verstecke die Chat-Übersicht
-        cardElement.style.display = 'flex'; // Zeige den Swipen-Bereich an
+        chatOverview.style.display = 'none';
+        cardElement.style.display = 'flex';
     });
 
     // Formular zum Hinzufügen eines Autos absenden
@@ -176,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.status === 'success') {
                     alert('Auto erfolgreich hinzugefügt!');
                     addCarWindow.style.display = 'none';
-                    cardElement.style.display = 'flex'; // Zurück zur Swipen-Ansicht
+                    cardElement.style.display = 'flex';
                 } else {
                     alert('Fehler beim Hinzufügen des Autos.');
                 }
@@ -204,7 +285,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     loginForm.style.display = 'block';
                     profileInfo.style.display = 'none';
-                    // Standard-Nutzer verwenden
                     sessionStorage.setItem('username', 'guest');
                     profileUsername.textContent = 'Gast';
                 }
@@ -228,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        window.location.reload(); // Seite neu laden
+                        window.location.reload();
                     } else {
                         alert('Anmeldung fehlgeschlagen');
                     }
@@ -249,7 +329,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        // Automatische Anmeldung nach der Registrierung
                         fetch('/login', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -258,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             .then(response => response.json())
                             .then(data => {
                                 if (data.status === 'success') {
-                                    window.location.reload(); // Seite neu laden
+                                    window.location.reload();
                                 } else {
                                     alert('Automatische Anmeldung fehlgeschlagen');
                                 }
@@ -278,17 +357,14 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Verstecke alle anderen Bereiche und zeige den Anmeldebildschirm an
-                    cardElement.style.display = 'none'; // Swipen ausblenden
-                    detailView.style.display = 'none'; // Detailansicht ausblenden
-                    chatWindow.style.display = 'none'; // Chatfenster ausblenden
-                    chatOverview.style.display = 'none'; // Chat-Übersicht ausblenden
-                    profileWindow.style.display = 'flex'; // Anmeldebildschirm anzeigen
-
-                    // Setze das Anmeldeformular zurück
+                    cardElement.style.display = 'none';
+                    detailView.style.display = 'none';
+                    chatWindow.style.display = 'none';
+                    chatOverview.style.display = 'none';
+                    profileWindow.style.display = 'flex';
                     loginUsername.value = '';
                     loginPassword.value = '';
-                    checkLoginStatus(); // Aktualisiere den Anmeldestatus
+                    checkLoginStatus();
                 }
             });
     });
@@ -299,32 +375,26 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 chatList.innerHTML = '';
-                const uniqueCarIds = [...new Set(data.map(chat => chat.car_id))]; // Eindeutige Auto-IDs
+                const uniqueCarIds = [...new Set(data.map(chat => chat.car_id))];
                 uniqueCarIds.forEach(carId => {
-                    // Lade die Auto-Daten für den Titel und das Bild
                     fetch(`/get_car?id=${carId}`)
                         .then(response => response.json())
                         .then(carData => {
                             const chatEntry = document.createElement('div');
                             chatEntry.className = 'chat-entry';
 
-                            // Bild des Autos
                             const carImage = document.createElement('img');
                             carImage.src = carData.image || 'data/gap_filler.jpg';
                             carImage.className = 'chat-car-image';
 
-                            // Titel des Autos
                             const carTitle = document.createElement('span');
                             carTitle.textContent = carData.title;
 
-                            // Füge Bild und Titel zum Chat-Eintrag hinzu
                             chatEntry.appendChild(carImage);
                             chatEntry.appendChild(carTitle);
 
-                            // Klick-Event zum Öffnen des Chats
-                            chatEntry.addEventListener('click', () => openChat(carId, 'overview')); // Öffne den Chat aus der Chat-Übersicht
+                            chatEntry.addEventListener('click', () => openChat(carId, 'overview'));
 
-                            // Füge den Chat-Eintrag zur Liste hinzu
                             chatList.appendChild(chatEntry);
                         })
                         .catch(error => {
@@ -339,16 +409,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funktion zum Öffnen eines Chats
     function openChat(carId, from) {
-        currentChatCarId = carId; // Setze die aktuelle Chat-Auto-ID
-        chatOpenedFrom = from; // Speichere, von wo aus der Chat geöffnet wurde
+        currentChatCarId = carId;
+        chatOpenedFrom = from;
 
         if (from === 'detail') {
-            detailView.style.display = 'none'; // Verstecke die Detailansicht
+            detailView.style.display = 'none';
         } else if (from === 'overview') {
-            chatOverview.style.display = 'none'; // Verstecke die Chat-Übersicht
+            chatOverview.style.display = 'none';
         }
 
-        chatWindow.style.display = 'flex'; // Zeige das Chatfenster an
+        chatWindow.style.display = 'flex';
         loadChatMessages(carId);
     }
 
@@ -357,9 +427,9 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/get_chat_messages/${carId}`)
             .then(response => response.json())
             .then(data => {
-                chatMessages.innerHTML = ''; // Leere die Nachrichten vor dem Laden
+                chatMessages.innerHTML = '';
                 data.forEach(chat => {
-                    if (chat.car_id === carId) { // Nur Nachrichten für das aktuelle Auto anzeigen
+                    if (chat.car_id === carId) {
                         const messageElement = document.createElement('div');
                         messageElement.textContent = `Ich: ${chat.message}`;
                         chatMessages.appendChild(messageElement);
@@ -373,29 +443,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Chatfenster schließen
     closeChatBtn.addEventListener('click', () => {
-        chatWindow.style.display = 'none'; // Verstecke das Chatfenster
+        chatWindow.style.display = 'none';
 
-        // Entscheide, wohin der Benutzer zurückkehren soll
         if (chatOpenedFrom === 'detail') {
-            detailView.style.display = 'flex'; // Zeige die Detailansicht an
+            detailView.style.display = 'flex';
         } else if (chatOpenedFrom === 'overview') {
-            chatOverview.style.display = 'flex'; // Zeige die Chat-Übersicht an
+            chatOverview.style.display = 'flex';
         }
 
-        chatOpenedFrom = null; // Setze den Zustand zurück
+        chatOpenedFrom = null;
     });
 
     // Nachricht senden
     sendBtn.addEventListener('click', () => {
         const message = chatInput.value.trim();
-        if (message && currentChatCarId) { // Nur senden, wenn eine Nachricht und eine gültige Auto-ID vorhanden sind
+        if (message && currentChatCarId) {
             const chatEntry = {
-                car_id: currentChatCarId, // Verwende die aktuelle Chat-Auto-ID
+                car_id: currentChatCarId,
                 message: message,
                 timestamp: new Date().toLocaleString()
             };
 
-            // Nachricht speichern
             fetch('/save_chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -404,34 +472,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     console.log('Chat gespeichert:', data);
-                    // Nachricht im Chatfenster anzeigen
                     const messageElement = document.createElement('div');
                     messageElement.textContent = `Ich: ${message}`;
                     chatMessages.appendChild(messageElement);
-                    chatInput.value = ''; // Eingabefeld leeren
+                    chatInput.value = '';
                 })
                 .catch(error => {
                     console.error('Fehler beim Speichern des Chats:', error);
                 });
         } else {
             console.warn('Nachricht oder Auto-ID fehlt.');
-            console.log('Aktuelle Chat-Auto-ID:', currentChatCarId);
-            console.log('Nachricht:', message);
         }
     });
 
     // Funktion zum Laden eines neuen Autos
     function loadCarData(carId) {
-        loadingOverlay.style.display = 'flex'; // Ladeanzeige aktivieren
-    
-        // Überprüfen, ob das Auto bereits im Cache ist
+        loadingOverlay.style.display = 'flex';
+
         const cachedCar = cachedCars.find(car => car.id === carId);
         if (cachedCar) {
             displayCarData(cachedCar);
             return;
         }
-    
-        // Auto-Daten vom Server laden
+
         fetch(`/predict/${carId}`)
             .then(response => {
                 if (!response.ok) {
@@ -441,41 +504,35 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 console.log(`Vorhersage für Auto ${carId}:`, data.prediction);
-    
-                // Überprüfen, ob eine Vorhersage möglich war
+
                 if (data.prediction === 'Keine eindeutige Vorhersage möglich.') {
                     console.warn('Keine Vorhersage möglich, da das Modell noch nicht genügend Daten hat.');
-                    // Setze die Vorhersage auf einen Standardwert
                     data.prediction = 'Keine Vorhersage';
                     data.confidence = 0;
                 } else if (data.confidence !== undefined) {
                     console.log(`Konfidenz: ${data.confidence.toFixed(2)}%`);
                 }
-    
-                // Überspringe "Dislike"-Fahrzeuge, wenn der Button aktiviert ist und ab dem 30. Fahrzeug
+
                 if (skipDislikesToggle.checked && carCounter >= 30 && data.prediction === 'Nein') {
                     console.log(`Fahrzeug ${carId} wird übersprungen (Dislike-Vorhersage).`);
-                    currentCarId++; // Überspringe das aktuelle Fahrzeug
-                    loadCarData(currentCarId); // Lade das nächste Fahrzeug
+                    currentCarId++;
+                    loadCarData(currentCarId);
                     return;
                 }
-    
-                // Immer Klassen hinzufügen, aber Farben erst nach 30 Autos aktivieren
+
                 cardElement.classList.remove('ja', 'nein');
                 if (data.prediction === 'Ja') {
                     cardElement.classList.add('ja');
                 } else if (data.prediction === 'Nein') {
                     cardElement.classList.add('nein');
                 }
-    
-                // Zähler erhöhen
+
                 carCounter++;
-    
-                // Falls 30 Autos geladen wurden, Klasse für sichtbare Farben aktivieren
+
                 if (carCounter >= 30) {
                     cardElement.classList.add('visible-colors');
                 }
-    
+
                 return fetch(`/get_car?id=${carId}`);
             })
             .then(response => {
@@ -485,7 +542,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                // Auto-Daten im Cache speichern
                 cachedCars.push(data);
                 displayCarData(data);
             })
@@ -500,7 +556,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayCarData(data) {
         carTitleElement.textContent = data.title;
 
-        // Informationen in zwei Spalten anzeigen
         let carDetails = `
             <div class="car-details">
                 <div class="left">
@@ -517,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         carImgElement.src = data.image || 'data/gap_filler.jpg';
 
-        loadingOverlay.style.display = 'none'; // Ladeanzeige ausblenden
+        loadingOverlay.style.display = 'none';
     }
 
     // Doppelklick für die Detailansicht (Desktop)
@@ -536,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (car) {
                 showDetailView(car);
             }
-        }, 500); // 500 Millisekunden für Long Press
+        }, 500);
     });
 
     cardElement.addEventListener('touchend', () => {
@@ -552,26 +607,21 @@ document.addEventListener('DOMContentLoaded', function() {
         detailTitle.textContent = car.title;
         detailImage.src = car.image;
 
-        // Fülle die linke Spalte
         document.getElementById('detail-price').textContent = car.price;
         document.getElementById('detail-mileage').textContent = car.mileage;
         document.getElementById('detail-power').textContent = car.power;
         document.getElementById('detail-registration').textContent = car.firstRegistration;
-
-        // Fülle die rechte Spalte
         document.getElementById('detail-transmission').textContent = car.transmission;
         document.getElementById('detail-fuel').textContent = car.fuel;
         document.getElementById('detail-tax').textContent = car.tax || 'Keine Angabe';
         document.getElementById('detail-mpg').textContent = car.mpg || 'Keine Angabe';
 
-        // Lade die Bilder für das Auto
         fetch(`/get_car_images/${car.id}`)
             .then(response => response.json())
             .then(data => {
                 const images = data.images;
                 let currentImageIndex = 0;
 
-                // Funktion zum Wechseln des Bildes
                 function changeImage(direction) {
                     currentImageIndex += direction;
                     if (currentImageIndex >= images.length) {
@@ -582,7 +632,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     detailImage.src = images[currentImageIndex];
                 }
 
-                // Event-Listener für die Pfeiltasten
                 document.getElementById('prev-image-btn').addEventListener('click', () => {
                     changeImage(-1);
                 });
@@ -591,7 +640,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     changeImage(1);
                 });
 
-                // Event-Listener für die Pfeiltasten (Tastatur)
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'ArrowRight') {
                         changeImage(1);
@@ -600,7 +648,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
 
-                // Event-Listener für Touch-Gesten (Mobile)
                 let touchStartX = 0;
                 detailImage.addEventListener('touchstart', (e) => {
                     touchStartX = e.touches[0].clientX;
@@ -610,9 +657,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const touchEndX = e.changedTouches[0].clientX;
                     const deltaX = touchEndX - touchStartX;
                     if (deltaX > 50) {
-                        changeImage(-1); // Wische nach rechts -> vorheriges Bild
+                        changeImage(-1);
                     } else if (deltaX < -50) {
-                        changeImage(1); // Wische nach links -> nächstes Bild
+                        changeImage(1);
                     }
                 });
             })
@@ -630,8 +677,130 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Chatfenster öffnen
     chatBtn.addEventListener('click', () => {
-        currentChatCarId = currentCarId; // Setze die aktuelle Chat-Auto-ID auf die aktuelle Auto-ID
-        openChat(currentChatCarId, 'detail'); // Öffne den Chat aus der Detailansicht
+        currentChatCarId = currentCarId;
+        openChat(currentChatCarId, 'detail');
+    });
+
+    // Event-Listener für den "Chats"-Button in der Detailansicht hinzugefügter Autos
+    addedCarChatBtn.addEventListener('click', () => {
+        buyerChatsWindow.style.display = 'flex';
+    });
+
+    // Event-Listener für den "Schließen"-Button im Fenster "Chats mit Käufern"
+    closeBuyerChatsBtn.addEventListener('click', () => {
+        buyerChatsWindow.style.display = 'none';
+    });
+
+    // Event-Listener für den Lösch-Button
+    addedCarDeleteBtn.addEventListener('click', () => {
+        if (confirm('Möchten Sie dieses Auto wirklich löschen?')) {
+            const carId = currentCarId;
+            console.log('Versuche Auto zu löschen mit ID:', carId);
+
+            fetch(`/delete_car/${carId}`, {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Antwort vom Server:', data);
+                    if (data.status === 'success') {
+                        alert('Auto erfolgreich gelöscht!');
+                        addedCarDetailView.style.display = 'none';
+                        loadAddedCars();
+                    } else {
+                        alert('Fehler beim Löschen des Autos.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Fehler:', error);
+                    alert('Fehler beim Löschen des Autos.');
+                });
+        }
+    });
+
+    // Event-Listener für das Klicken auf ein hinzugefügtes Auto
+    document.getElementById('added-cars-container').addEventListener('click', (e) => {
+        const carElement = e.target.closest('.added-car');
+        if (carElement) {
+            const carId = carElement.dataset.carId;
+            const car = cachedCars.find(car => car.id === parseInt(carId));
+            if (car) {
+                showAddedCarDetailView(car);
+            }
+        }
+    });
+
+    // Funktion zum Anzeigen der Detailansicht für hinzugefügte Autos
+    function showAddedCarDetailView(car) {
+        addedCarDetailTitle.textContent = car.title;
+        addedCarDetailImage.src = car.image;
+
+        addedCarDetailPrice.textContent = car.price;
+        addedCarDetailMileage.textContent = car.mileage;
+        addedCarDetailPower.textContent = car.power;
+        addedCarDetailRegistration.textContent = car.firstRegistration;
+        addedCarDetailTransmission.textContent = car.transmission;
+        addedCarDetailFuel.textContent = car.fuel;
+        addedCarDetailTax.textContent = car.tax || 'Keine Angabe';
+        addedCarDetailMpg.textContent = car.mpg || 'Keine Angabe';
+
+        fetch(`/get_car_images/${car.id}`)
+            .then(response => response.json())
+            .then(data => {
+                const images = data.images;
+                let currentImageIndex = 0;
+
+                function changeImage(direction) {
+                    currentImageIndex += direction;
+                    if (currentImageIndex >= images.length) {
+                        currentImageIndex = 0;
+                    } else if (currentImageIndex < 0) {
+                        currentImageIndex = images.length - 1;
+                    }
+                    addedCarDetailImage.src = images[currentImageIndex];
+                }
+
+                document.getElementById('added-car-prev-image-btn').addEventListener('click', () => {
+                    changeImage(-1);
+                });
+
+                document.getElementById('added-car-next-image-btn').addEventListener('click', () => {
+                    changeImage(1);
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight') {
+                        changeImage(1);
+                    } else if (e.key === 'ArrowLeft') {
+                        changeImage(-1);
+                    }
+                });
+
+                let touchStartX = 0;
+                addedCarDetailImage.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                });
+
+                addedCarDetailImage.addEventListener('touchend', (e) => {
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const deltaX = touchEndX - touchStartX;
+                    if (deltaX > 50) {
+                        changeImage(-1);
+                    } else if (deltaX < -50) {
+                        changeImage(1);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Fehler beim Laden der Bilder:', error);
+            });
+
+        addedCarDetailView.style.display = 'flex';
+    }
+
+    // Zurück zur Profilansicht
+    addedCarBackBtn.addEventListener('click', () => {
+        addedCarDetailView.style.display = 'none';
     });
 
     // Hammer.js für Swipe-Gesten
@@ -675,10 +844,8 @@ document.addEventListener('DOMContentLoaded', function() {
             cardElement.style.transition = 'transform 0.5s ease-out';
             cardElement.style.transform = `translate(${deltaX > 0 ? 1000 : -1000}px, ${ev.deltaY}px) rotate(${ev.deltaX / 20}deg)`;
 
-            // Feedback senden
             sendFeedback(currentCarId, action);
 
-            // Nächstes Auto laden
             currentCarId++;
             setTimeout(() => {
                 cardElement.style.transition = 'none';

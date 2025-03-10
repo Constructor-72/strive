@@ -72,6 +72,19 @@ def get_car_images(car_id):
     else:
         return jsonify({'status': 'failure', 'message': 'Car not found'}), 404
 
+# API: Benutzerdaten abrufen
+@app.route('/get_user', methods=['GET'])
+def get_user():
+    if 'username' not in session:
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
+
+    users = load_users()
+    username = session['username']
+    if username in users:
+        return jsonify(users[username])
+    else:
+        return jsonify({'status': 'failure', 'message': 'Benutzer nicht gefunden'}), 404
+
 # Lade Benutzerdaten
 def load_users():
     if not os.path.exists(USERS_FILE):
@@ -103,7 +116,8 @@ def register():
         'password': hashed_password,  # Speichere das gehashte Passwort
         'likes': [],
         'dislikes': [],
-        'chats': []
+        'chats': [],
+        'added_cars': []  # Liste der hinzugefügten Autos
     }
     save_users(users)
     return jsonify({'status': 'success'})
@@ -319,8 +333,15 @@ def add_car():
     # Verwende pd.concat statt append
     new_df = pd.DataFrame([new_car])
     df = pd.concat([df, new_df], ignore_index=True)
-
     df.to_csv(file_path, sep=';', index=False)
+
+    # Füge die Auto-ID zur Liste der hinzugefügten Autos des Benutzers hinzu
+    users = load_users()
+    username = session['username']
+    if 'added_cars' not in users[username]:
+        users[username]['added_cars'] = []
+    users[username]['added_cars'].append(new_car_id)
+    save_users(users)
 
     return jsonify({'status': 'success', 'message': 'Auto erfolgreich hinzugefügt', 'car_id': new_car_id})
 
@@ -342,6 +363,41 @@ def upload_images(car_id):
 
     return jsonify({'status': 'success', 'message': 'Bilder erfolgreich hochgeladen'})
 
+# API: Auto löschen
+@app.route('/delete_car/<car_id>', methods=['DELETE'])
+def delete_car(car_id):
+    if 'username' not in session:
+        return jsonify({'status': 'failure', 'message': 'Nicht angemeldet'}), 401
+
+    users = load_users()
+    username = session['username']
+
+    # Überprüfen, ob das Auto in der Liste der hinzugefügten Autos des Benutzers ist
+    if 'added_cars' not in users[username] or car_id not in users[username]['added_cars']:
+        return jsonify({'status': 'failure', 'message': 'Auto nicht gefunden'}), 404
+
+    # Entferne das Auto aus der CSV-Datei
+    file_path = os.path.join(DATA_FOLDER, 'cars.csv')
+    df = pd.read_csv(file_path, delimiter=';')
+
+    # Stelle sicher, dass die ID korrekt verglichen wird (als String)
+    df['ID'] = df['ID'].astype(str)  # Konvertiere die ID-Spalte in Strings
+    df = df[df['ID'] != str(car_id)]  # Filtere die Zeile mit der entsprechenden ID heraus
+
+    # Speichere die aktualisierte CSV-Datei
+    df.to_csv(file_path, sep=';', index=False)
+
+    # Lösche die Bilder des Autos
+    image_folder = os.path.join(DATA_FOLDER, 'jpg')
+    for filename in os.listdir(image_folder):
+        if filename.startswith(f"{car_id}_"):
+            os.remove(os.path.join(image_folder, filename))
+
+    # Entferne das Auto aus der Liste der hinzugefügten Autos des Benutzers
+    users[username]['added_cars'].remove(car_id)
+    save_users(users)
+
+    return jsonify({'status': 'success', 'message': 'Auto erfolgreich gelöscht'})
 
 # Hauptseite
 @app.route('/')
