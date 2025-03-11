@@ -58,3 +58,4 @@ ID;brand;model;year;price;transmission;mileage;fuelType;tax;mpg;engineSize;numbe
 57;BMW;X5;2019;47500.0;Semi-Auto;6224;Diesel;145.0;36.7;3.0;2
 58;Skoda;Fabia;2019;9295.0;Manual;5078;Petrol;145.0;57.7;1.0;3
 59;Skoda;Fabia;2020;13430.0;Manual;985;Petrol;145.0;50.4;1.0;3
+11419622;Tesla;Model 3;2021;30000.0;Automatic;95000;Electric;0.0;0.0;0.0;1

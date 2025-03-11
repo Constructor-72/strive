@@ -91,7 +91,9 @@
                 "timestamp": "11.3.2025, 00:00:42"
             }
         ],
-        "added_cars": []
+        "added_cars": [
+            "11419622"
+        ]
     },
     "test": {
         "password": "$2b$12$mNu.U2rf9Xvr.FKAxTNDcOpifoXEmzJsQg6jWoQY6vsN5SN2SIHVi",
